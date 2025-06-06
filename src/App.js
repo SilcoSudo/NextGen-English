@@ -344,7 +344,7 @@ const App: React.FC = () => {
                   className="w-12 h-12 rounded-full object-cover mr-4"
                 />
                 <div>
-                  <h4 className="font-bold">Anh PhươngPhương Tuấn</h4>
+                  <h4 className="font-bold">Anh Phương Tuấn</h4>
                   <p className="text-gray-600 text-sm">Phụ huynh học sinh</p>
                 </div>
               </div>
