@@ -318,7 +318,7 @@ const App: React.FC = () => {
                   className="w-12 h-12 rounded-full object-cover mr-4"
                 />
                 <div>
-                  <h4 className="font-bold">Chị Ngọc Anh</h4>
+                  <h4 className="font-bold">Chị Thiên An</h4>
                   <p className="text-gray-600 text-sm">Phụ huynh học sinh</p>
                 </div>
               </div>
@@ -344,7 +344,7 @@ const App: React.FC = () => {
                   className="w-12 h-12 rounded-full object-cover mr-4"
                 />
                 <div>
-                  <h4 className="font-bold">Anh Minh Tuấn</h4>
+                  <h4 className="font-bold">Anh PhươngPhương Tuấn</h4>
                   <p className="text-gray-600 text-sm">Phụ huynh học sinh</p>
                 </div>
               </div>
@@ -370,7 +370,7 @@ const App: React.FC = () => {
                   className="w-12 h-12 rounded-full object-cover mr-4"
                 />
                 <div>
-                  <h4 className="font-bold">Bé Minh Anh</h4>
+                  <h4 className="font-bold">Bé Sol</h4>
                   <p className="text-gray-600 text-sm">Học sinh lớp 4</p>
                 </div>
               </div>
