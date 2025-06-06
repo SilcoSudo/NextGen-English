@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/kidenglish-app/static/css/main.025e50f3.css",
+    "main.js": "/kidenglish-app/static/js/main.fac8927e.js",
+    "static/js/453.34742960.chunk.js": "/kidenglish-app/static/js/453.34742960.chunk.js",
+    "index.html": "/kidenglish-app/index.html",
+    "main.025e50f3.css.map": "/kidenglish-app/static/css/main.025e50f3.css.map",
+    "main.fac8927e.js.map": "/kidenglish-app/static/js/main.fac8927e.js.map",
+    "453.34742960.chunk.js.map": "/kidenglish-app/static/js/453.34742960.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.025e50f3.css",
+    "static/js/main.fac8927e.js"
+  ]
+}
