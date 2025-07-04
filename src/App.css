@@ -1,3 +1,7 @@
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+    font-family: 'Nunito', sans-serif;
+}
 .App {
   text-align: center;
 }
@@ -35,4 +39,88 @@
   to {
     transform: rotate(360deg);
   }
+}
+.hero-gradient {
+    background: linear-gradient(135deg, #4169E1 0%, #6A5ACD 100%);
+}
+.card-shadow {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.btn-primary {
+    background-color: #4169E1;
+    color: white;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    background-color: #3a5ecc;
+    transform: translateY(-2px);
+}
+.btn-secondary {
+    background-color: #FF6B6B;
+    color: white;
+    transition: all 0.3s ease;
+}
+.btn-secondary:hover {
+    background-color: #ff5252;
+    transform: translateY(-2px);
+}
+.progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #E5E7EB;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #4169E1 0%, #6A5ACD 100%);
+}
+.avatar {
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.badge::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background-color: #FF6B6B;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+.streak-day {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #6B7280;
+    background-color: #F3F4F6;
+    transition: all 0.2s ease;
+}
+.streak-day.active {
+    background-color: #4169E1;
+    color: white;
+    transform: scale(1.1);
+}
+.streak-day.completed {
+    background-color: #10B981;
+    color: white;
+}
+input:focus, button:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #4169E1;
 }
