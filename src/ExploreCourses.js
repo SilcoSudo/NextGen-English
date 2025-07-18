@@ -89,7 +89,7 @@ function ExploreCourses() {
                 <input type="range" min="0" max="5000000" defaultValue="2500000" className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer" />
                 <div className="flex justify-between mt-2">
                   <span className="text-sm text-gray-600">0đ</span>
-                  <span className="text-sm text-gray-600">5.000.000đ</span>
+                  <span className="text-sm text-gray-600">500.000đ</span>
                 </div>
               </div>
               <button className="w-full py-2.5 bg-primary text-white rounded-button font-medium whitespace-nowrap !rounded-button">
@@ -120,13 +120,13 @@ function ExploreCourses() {
                     <div className="w-6 h-6 flex items-center justify-center bg-blue-100 rounded-full mr-2">
                       <i className="ri-time-line text-primary"></i>
                     </div>
-                    <span className="text-sm text-gray-600">12 tuần học</span>
+                    <span className="text-sm text-gray-600">8 tuần học</span>
                   </div>
                   <div className="flex items-center">
                     <div className="w-6 h-6 flex items-center justify-center bg-green-100 rounded-full mr-2">
                       <i className="ri-book-open-line text-green-600"></i>
                     </div>
-                    <span className="text-sm text-gray-600">24 bài học</span>
+                    <span className="text-sm text-gray-600">16 bài học</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between mb-4">
@@ -139,7 +139,7 @@ function ExploreCourses() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">2.400.000đ</span>
+                  <span className="text-2xl font-bold text-primary">500.000đ</span>
                   <button className="px-4 py-2 bg-primary text-white rounded-button font-medium whitespace-nowrap !rounded-button">Đăng ký học</button>
                 </div>
               </div>
@@ -163,26 +163,26 @@ function ExploreCourses() {
                     <div className="w-6 h-6 flex items-center justify-center bg-blue-100 rounded-full mr-2">
                       <i className="ri-time-line text-primary"></i>
                     </div>
-                    <span className="text-sm text-gray-600">8 tuần học</span>
+                    <span className="text-sm text-gray-600">4 tuần học</span>
                   </div>
                   <div className="flex items-center">
                     <div className="w-6 h-6 flex items-center justify-center bg-green-100 rounded-full mr-2">
                       <i className="ri-book-open-line text-green-600"></i>
                     </div>
-                    <span className="text-sm text-gray-600">16 bài học</span>
+                    <span className="text-sm text-gray-600">10 bài học</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
                     <img src="https://readdy.ai/api/search-image?query=professional%20male%20teacher%20portrait%2C%20friendly%20smile%2C%20simple%20background&width=32&height=32&seq=teacher2&orientation=squarish" className="w-8 h-8 rounded-full border-2 border-white mr-2" alt="Teacher" />
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Trần Văn Minh</p>
+                      <p className="text-sm font-medium text-gray-800">Trịnh Trần Văn Minh</p>
                       <p className="text-xs text-gray-600">Giáo viên chính</p>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">1.800.000đ</span>
+                  <span className="text-2xl font-bold text-primary">300.000đ</span>
                   <button className="px-4 py-2 bg-primary text-white rounded-button font-medium whitespace-nowrap !rounded-button">Đăng ký học</button>
                 </div>
               </div>
@@ -206,13 +206,13 @@ function ExploreCourses() {
                     <div className="w-6 h-6 flex items-center justify-center bg-blue-100 rounded-full mr-2">
                       <i className="ri-time-line text-primary"></i>
                     </div>
-                    <span className="text-sm text-gray-600">10 tuần học</span>
+                    <span className="text-sm text-gray-600">12 tuần học</span>
                   </div>
                   <div className="flex items-center">
                     <div className="w-6 h-6 flex items-center justify-center bg-green-100 rounded-full mr-2">
                       <i className="ri-book-open-line text-green-600"></i>
                     </div>
-                    <span className="text-sm text-gray-600">20 bài học</span>
+                    <span className="text-sm text-gray-600">12 bài học</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between mb-4">
@@ -225,7 +225,7 @@ function ExploreCourses() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">2.200.000đ</span>
+                  <span className="text-2xl font-bold text-primary">450.000đ</span>
                   <button className="px-4 py-2 bg-primary text-white rounded-button font-medium whitespace-nowrap !rounded-button">Đăng ký học</button>
                 </div>
               </div>
