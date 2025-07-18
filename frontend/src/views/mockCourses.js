@@ -1,0 +1,135 @@
+const mockCourses = [
+  {
+    id: 1,
+    image: "https://readdy.ai/api/search-image?query=classroom%20with%20children%20and%20whiteboard%20displaying%20English%20words%2C%20cartoon%20illustration&width=400&height=250&seq=speaking&orientation=landscape",
+    label: "Phổ biến",
+    labelColor: "bg-yellow-400 text-white",
+    level: "Cơ bản",
+    levelColor: "bg-blue-100 text-blue-700",
+    age: "4-7 tuổi",
+    skills: ["Nói"],
+    title: "Speaking: Greetings & Introductions",
+    description: "Learn how to introduce yourself and greet others in English.",
+    weeks: 2,
+    lessons: 8,
+    teacherName: "Sarah Johnson",
+    teacherRole: "Giáo viên chính",
+    price: "299.000đ",
+    originalPrice: "399.000đ",
+    teacherAvatar: "https://readdy.ai/api/search-image?query=professional%20female%20teacher%20portrait&width=32&height=32&seq=teacher1&orientation=squarish",
+    students: 1250,
+    rating: 4.8,
+    topics: [
+      { name: "Chào hỏi cơ bản", description: "Học cách chào hỏi và giới thiệu bản thân." },
+      { name: "Tên và tuổi", description: "Hỏi và trả lời về tên, tuổi." },
+      { name: "Quốc gia", description: "Giới thiệu về quốc gia và quốc tịch." }
+    ]
+  },
+  {
+    id: 2,
+    image: "https://readdy.ai/api/search-image?query=children%20with%20headphones%20and%20microphone%2C%20cartoon%20illustration&width=400&height=250&seq=listening&orientation=landscape",
+    label: "Mới",
+    labelColor: "bg-green-500 text-white",
+    level: "Trung cấp",
+    levelColor: "bg-purple-100 text-purple-700",
+    age: "8-10 tuổi",
+    skills: ["Nghe"],
+    title: "Listening: Daily Conversations",
+    description: "Practice understanding everyday English conversations.",
+    weeks: 1.5,
+    lessons: 6,
+    teacherName: "Mike Chen",
+    teacherRole: "Giáo viên chính",
+    price: "249.000đ",
+    originalPrice: "349.000đ",
+    teacherAvatar: "https://readdy.ai/api/search-image?query=professional%20male%20teacher%20portrait&width=32&height=32&seq=teacher2&orientation=squarish",
+    students: 890,
+    rating: 4.6,
+    topics: [
+      { name: "Hội thoại hàng ngày", description: "Luyện nghe các cuộc hội thoại thường gặp." },
+      { name: "Đặt hàng", description: "Nghe và hiểu khi đặt đồ ăn, mua sắm." },
+      { name: "Hỏi đường", description: "Hội thoại hỏi đường và chỉ đường." }
+    ]
+  },
+  {
+    id: 3,
+    image: "https://readdy.ai/api/search-image?query=children%20reading%20book%20in%20library%2C%20cartoon%20illustration&width=400&height=250&seq=reading&orientation=landscape",
+    label: "Mới",
+    labelColor: "bg-green-500 text-white",
+    level: "Cơ bản",
+    levelColor: "bg-blue-100 text-blue-700",
+    age: "4-7 tuổi",
+    skills: ["Đọc"],
+    title: "Reading: Short Stories",
+    description: "Improve reading skills with fun and engaging short stories.",
+    weeks: 1,
+    lessons: 5,
+    teacherName: "Emma Wilson",
+    teacherRole: "Giáo viên chính",
+    price: "199.000đ",
+    originalPrice: "299.000đ",
+    teacherAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    students: 0,
+    rating: 0,
+    topics: [
+      { name: "Truyện ngắn", description: "Đọc hiểu các câu chuyện ngắn đơn giản." },
+      { name: "Từ vựng", description: "Học từ vựng mới qua ngữ cảnh." },
+      { name: "Hiểu ý chính", description: "Nắm bắt ý chính của câu chuyện." }
+    ]
+  },
+  {
+    id: 4,
+    image: "https://readdy.ai/api/search-image?query=writing%20notebook%20with%20pencil%2C%20cartoon%20illustration&width=400&height=250&seq=writing&orientation=landscape",
+    label: "Hot",
+    labelColor: "bg-red-500 text-white",
+    level: "Cơ bản",
+    levelColor: "bg-blue-100 text-blue-700",
+    age: "4-7 tuổi",
+    skills: ["Viết"],
+    title: "Writing: Basic Sentences",
+    description: "Master the fundamentals of English sentence structure.",
+    weeks: 1.8,
+    lessons: 7,
+    teacherName: "David Brown",
+    teacherRole: "Giáo viên chính",
+    price: "179.000đ",
+    originalPrice: "279.000đ",
+    teacherAvatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    students: 650,
+    rating: 4.7,
+    topics: [
+      { name: "Cấu trúc câu", description: "Học cách viết câu đơn giản đúng ngữ pháp." },
+      { name: "Từ vựng", description: "Mở rộng vốn từ vựng để viết câu." },
+      { name: "Dấu câu", description: "Sử dụng dấu câu đúng cách." }
+    ]
+  },
+  // Thêm các course mới cho 4-7 tuổi và 8-10 tuổi
+  {
+    id: 5,
+    image: "https://readdy.ai/api/search-image?query=grammar%20book%20with%20examples%2C%20cartoon%20illustration&width=400&height=250&seq=grammar&orientation=landscape",
+    label: "Phổ biến",
+    labelColor: "bg-yellow-400 text-white",
+    level: "Trung cấp",
+    levelColor: "bg-purple-100 text-purple-700",
+    age: "8-10 tuổi",
+    skills: ["Ngữ pháp"],
+    title: "Grammar: Present Tense",
+    description: "Learn and practice present tense in English.",
+    weeks: 2.5,
+    lessons: 10,
+    teacherName: "Lisa Park",
+    teacherRole: "Giáo viên chính",
+    price: "229.000đ",
+    originalPrice: "329.000đ",
+    teacherAvatar: "https://randomuser.me/api/portraits/women/55.jpg",
+    students: 1100,
+    rating: 4.9,
+    topics: [
+      { name: "Present Simple", description: "Học cách sử dụng thì hiện tại đơn." },
+      { name: "Present Continuous", description: "Thì hiện tại tiếp diễn." },
+      { name: "Present Perfect", description: "Thì hiện tại hoàn thành." }
+    ]
+  }
+];
+
+export default mockCourses; 
