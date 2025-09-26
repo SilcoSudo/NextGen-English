@@ -10,6 +10,7 @@ import Home from "../views/Home";
 import MyCourses from "../views/MyCourses";
 import Payment from "../views/Payment";
 import LoginPage from "../views/LoginPage";
+import RegisterPage from "../views/RegisterPage";
 import ProtectedRoute from "../views/ProtectedRoute";
 import AdminRoute from "../views/AdminRoute";
 import AdminHome from "../views/AdminHome";
@@ -35,6 +36,7 @@ function App() {
             </>
           } />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           
           {/* Protected Routes - Yêu cầu đăng nhập */}
           <Route path="/dashboard" element={
