@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../models/AuthContext';
-import AdminLayout from './AdminLayout';
+import AdminLayout from './admin/AdminLayout';
 
 function UserManagement() {
   const { user } = useAuth();

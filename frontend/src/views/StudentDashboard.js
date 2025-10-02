@@ -48,13 +48,13 @@ function StudentDashboard() {
         Quay lại Trang chủ
       </button>
       {/* Progress Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         {/* Today's Goal */}
-        <div className="bg-white rounded-lg p-6 card-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-800">Today's Goal</h2>
-            <div className="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full">
-              <i className="ri-target-line text-primary"></i>
+        <div className="bg-white rounded-lg p-4 md:p-6 card-shadow sm:col-span-2 lg:col-span-1">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h2 className="text-base md:text-lg font-bold text-gray-800">Today's Goal</h2>
+            <div className="w-7 h-7 md:w-8 md:h-8 flex items-center justify-center bg-blue-100 rounded-full">
+              <i className="ri-target-line text-primary text-sm md:text-base"></i>
             </div>
           </div>
           <div className="mb-3">
@@ -141,20 +141,20 @@ function StudentDashboard() {
           <h2 className="text-xl font-bold text-gray-800">Continue Learning</h2>
           <button className="text-primary text-sm font-medium">View All</button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Card 1 */}
           <div className="bg-white rounded-lg overflow-hidden card-shadow">
             <div className="relative">
               <img
                 src="https://readdy.ai/api/search-image?query=colorful%20classroom%20with%20children%20learning%20English%2C%20cartoon%20style%2C%20educational%20setting%2C%20bright%20colors%2C%20alphabet%20on%20wall&width=400&height=200&seq=lesson1&orientation=landscape"
                 alt="Speaking Lesson"
-                className="w-full h-48 object-cover object-top"
+                className="w-full h-32 md:h-48 object-cover object-top"
               />
-              <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded-full text-xs font-medium text-primary">
+              <div className="absolute top-2 md:top-3 right-2 md:right-3 bg-white px-2 py-1 rounded-full text-xs font-medium text-primary">
                 Lesson 3/8
               </div>
             </div>
-            <div className="p-5">
+            <div className="p-3 md:p-5">
               <div className="flex items-center mb-3">
                 <div className="w-6 h-6 flex items-center justify-center bg-blue-100 rounded-full mr-2">
                   <i className="ri-mic-line text-primary"></i>

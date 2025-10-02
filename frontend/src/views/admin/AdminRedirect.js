@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../models/AuthContext';
+import { useAuth } from '../../models/AuthContext';
 
 function AdminRedirect() {
   const navigate = useNavigate();

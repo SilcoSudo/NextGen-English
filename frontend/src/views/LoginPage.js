@@ -248,16 +248,14 @@ function LoginPage() {
                   </div>
                 </div>
 
-                {/* Modern Social Login Buttons */}
-                <div className="grid  gap-4">
-                  <button
-                    type="button"
-                    className="group bg-white border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700 py-4 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-105 hover:shadow-lg"
-                  >
-                    <i className="ri-google-fill text-red-500 text-xl group-hover:scale-110 transition-transform duration-300"></i>
-                    <span className="ml-2 hidden sm:inline">Google</span>
-                  </button>
-                </div>
+                {/* Google Login Button */}
+                <button
+                  type="button"
+                  className="group w-full bg-white border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700 py-4 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-105 hover:shadow-lg"
+                >
+                  <i className="ri-google-fill text-red-500 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
+                  <span>Đăng nhập với Google</span>
+                </button>
               </form>
 
               {/* Sign Up Link */}

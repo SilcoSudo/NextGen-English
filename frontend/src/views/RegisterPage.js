@@ -452,20 +452,13 @@ function RegisterPage() {
                 </div>
 
                 {/* Social Register Buttons */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols gap-4">
                   <button
                     type="button"
                     className="group bg-white border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700 py-4 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-105 hover:shadow-lg"
                   >
                     <i className="ri-google-fill text-red-500 text-xl group-hover:scale-110 transition-transform duration-300"></i>
                     <span className="ml-2 hidden sm:inline">Google</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="group bg-white border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 text-gray-700 py-4 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-105 hover:shadow-lg"
-                  >
-                    <i className="ri-facebook-fill text-blue-600 text-xl group-hover:scale-110 transition-transform duration-300"></i>
-                    <span className="ml-2 hidden sm:inline">Facebook</span>
                   </button>
                 </div>
               </form>

@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../models/AuthContext';
+import { useAuth } from '../../models/AuthContext';
 import AdminLayout from './AdminLayout';
-import { adminStats, courseData, recentActivities, formatPrice, formatNumber } from '../data/adminData';
+import { adminStats, courseData, recentActivities, formatPrice, formatNumber } from '../../data/adminData';
 
 function AdminHome() {
   const [activeTab, setActiveTab] = useState('dashboard');

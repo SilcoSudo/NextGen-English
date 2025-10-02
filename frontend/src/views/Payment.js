@@ -60,34 +60,34 @@ function Payment() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-6 md:py-8">
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Đăng ký khóa học</h1>
-          <p className="text-gray-600">Hoàn tất thông tin để bắt đầu hành trình học tập</p>
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">Đăng ký khóa học</h1>
+          <p className="text-gray-600 text-sm md:text-base">Hoàn tất thông tin để bắt đầu hành trình học tập</p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
           {/* Thông tin khóa học */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 order-2 lg:order-1">
+            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 flex items-center">
               <i className="ri-book-open-line text-blue-500 mr-2"></i>
               Thông tin khóa học
             </h2>
             
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-4">
-              <div className="flex items-start space-x-4">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 md:p-4 mb-4">
+              <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
                 <img 
                   src={course.image} 
                   alt={course.title} 
-                  className="w-20 h-20 rounded-lg object-cover"
+                  className="w-full sm:w-20 h-32 sm:h-20 rounded-lg object-cover"
                 />
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-800 mb-1">{course.title}</h3>
-                  <p className="text-sm text-gray-600 mb-2">{course.description}</p>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <img src={course.teacherAvatar} className="w-6 h-6 rounded-full mr-2" alt="Teacher" />
+                  <h3 className="font-bold text-gray-800 mb-1 text-sm md:text-base">{course.title}</h3>
+                  <p className="text-xs md:text-sm text-gray-600 mb-2 leading-relaxed">{course.description}</p>
+                  <div className="flex items-center text-xs md:text-sm text-gray-500">
+                    <img src={course.teacherAvatar} className="w-5 h-5 md:w-6 md:h-6 rounded-full mr-2" alt="Teacher" />
                     <span>{course.teacherName}</span>
                   </div>
                 </div>
@@ -119,15 +119,15 @@ function Payment() {
           </div>
 
           {/* Form đăng ký */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 order-1 lg:order-2">
+            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-3 md:mb-4 flex items-center">
               <i className="ri-user-line text-green-500 mr-2"></i>
               Thông tin đăng ký
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
                   Tên phụ huynh <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -136,13 +136,13 @@ function Payment() {
                   value={formData.parentName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
                   placeholder="Nhập tên phụ huynh"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
                   Tên học sinh <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -151,7 +151,7 @@ function Payment() {
                   value={formData.childName}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm md:text-base"
                   placeholder="Nhập tên học sinh"
                 />
               </div>
@@ -187,22 +187,22 @@ function Payment() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
                   Phương thức thanh toán
                 </label>
                 <div className="space-y-2">
-                  <label className="flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                  <label className="flex items-center p-2 md:p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="banking"
                       checked={formData.paymentMethod === "banking"}
                       onChange={handleInputChange}
-                      className="mr-3"
+                      className="mr-2 md:mr-3"
                     />
                     <div className="flex items-center">
-                      <i className="ri-bank-card-line text-blue-500 mr-2"></i>
-                      <span>Chuyển khoản ngân hàng</span>
+                      <i className="ri-bank-card-line text-blue-500 mr-2 text-sm md:text-base"></i>
+                      <span className="text-sm md:text-base">Chuyển khoản ngân hàng</span>
                     </div>
                   </label>
                   
@@ -241,17 +241,18 @@ function Payment() {
               <button
                 type="submit"
                 disabled={isProcessing}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-3 md:py-4 px-4 md:px-6 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm md:text-base"
               >
                 {isProcessing ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Đang xử lý...
+                    <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <span>Đang xử lý...</span>
                   </>
                 ) : (
                   <>
                     <i className="ri-lock-line mr-2"></i>
-                    Thanh toán an toàn - {course.price}
+                    <span className="hidden sm:inline">Thanh toán an toàn - </span>
+                    <span>{course.price}</span>
                   </>
                 )}
               </button>
@@ -270,13 +271,14 @@ function Payment() {
         </div>
 
         {/* Nút quay lại */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-6 md:mt-8">
           <button
             onClick={() => navigate('/courses')}
-            className="inline-flex items-center px-6 py-3 text-gray-600 hover:text-gray-800 transition-colors"
+            className="inline-flex items-center px-4 md:px-6 py-2 md:py-3 text-gray-600 hover:text-gray-800 transition-colors text-sm md:text-base"
           >
             <i className="ri-arrow-left-line mr-2"></i>
-            Quay lại danh sách khóa học
+            <span className="hidden sm:inline">Quay lại danh sách khóa học</span>
+            <span className="sm:hidden">Quay lại</span>
           </button>
         </div>
       </div>
