@@ -9,11 +9,10 @@ function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    dateOfBirth: '',
-    phone: '',
     agreeToTerms: false,
     receiveUpdates: false
   });
@@ -21,7 +20,7 @@ function RegisterPage() {
   const [error, setError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState(0);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -68,6 +67,9 @@ function RegisterPage() {
 
   const validateForm = () => {
     if (!formData.fullName.trim()) return 'Vui lòng nhập họ tên';
+    if (!formData.username.trim()) return 'Vui lòng nhập tên đăng nhập';
+    if (formData.username.length < 3) return 'Tên đăng nhập phải có ít nhất 3 ký tự';
+    if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) return 'Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới';
     if (!formData.email.trim() || !formData.email.includes('@')) return 'Vui lòng nhập email hợp lệ';
     if (formData.password.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
     if (formData.password !== formData.confirmPassword) return 'Mật khẩu xác nhận không khớp';
@@ -89,22 +91,20 @@ function RegisterPage() {
     }
 
     try {
-      // Mock registration delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock successful registration
-      console.log('Registration data:', formData);
-      
-      // Auto login after successful registration
-      const loginResult = login({
+      // Call register API
+      const registerResult = await register({
+        name: formData.fullName,
+        username: formData.username,
         email: formData.email,
         password: formData.password
       });
       
-      if (loginResult.success) {
+      if (registerResult.success) {
         // Show success message and redirect
         alert('🎉 Đăng ký thành công! Chào mừng bạn đến với NextGen English!');
-        navigate('/dashboard');
+        navigate('/');
+      } else {
+        setError(registerResult.error || 'Đăng ký thất bại');
       }
     } catch (error) {
       console.error('Registration failed:', error);
@@ -319,48 +319,24 @@ function RegisterPage() {
                   )}
                 </div>
 
-                {/* Additional Fields Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Date of Birth */}
-                  <div className="group">
-                    <label htmlFor="dateOfBirth" className="block text-sm font-semibold text-gray-700 mb-3 group-focus-within:text-indigo-600 transition-colors">
-                      <i className="ri-calendar-line mr-2"></i>
-                      Ngày sinh
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        id="dateOfBirth"
-                        name="dateOfBirth"
-                        value={formData.dateOfBirth}
-                        onChange={handleInputChange}
-                        className="w-full px-6 py-4 pl-14 bg-gray-50/50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all duration-300 text-base hover:border-gray-300"
-                      />
-                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors">
-                        <i className="ri-cake-line text-lg"></i>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Phone */}
-                  <div className="group">
-                    <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-3 group-focus-within:text-teal-600 transition-colors">
-                      <i className="ri-phone-line mr-2"></i>
-                      Số điện thoại
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="tel"
-                        id="phone"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        className="w-full px-6 py-4 pl-14 bg-gray-50/50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 focus:bg-white transition-all duration-300 text-base placeholder-gray-400 hover:border-gray-300"
-                        placeholder="0123456789"
-                      />
-                      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-teal-500 transition-colors">
-                        <i className="ri-smartphone-line text-lg"></i>
-                      </div>
+                {/* Username */}
+                <div className="group">
+                  <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-3 group-focus-within:text-teal-600 transition-colors">
+                    <i className="ri-user-line mr-2"></i>
+                    Tên đăng nhập
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      id="username"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleInputChange}
+                      className="w-full px-6 py-4 pl-14 bg-gray-50/50 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/20 focus:border-teal-500 focus:bg-white transition-all duration-300 text-base placeholder-gray-400 hover:border-gray-300"
+                      placeholder="vd: nguyen_van_a"
+                    />
+                    <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-teal-500 transition-colors">
+                      <i className="ri-at-line text-lg"></i>
                     </div>
                   </div>
                 </div>

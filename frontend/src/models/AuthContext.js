@@ -28,63 +28,89 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = (userData) => {
-    // Mock login với 2 tài khoản mẫu có mật khẩu
-    const mockUsers = {
-      'admin': {
-        id: 1,
-        name: 'Admin',
-        username: 'admin',
-        email: 'admin@nextgen.com',
-        password: 'admin123',
-        role: 'admin',
-        avatar: 'https://readdy.ai/api/search-image?query=professional%20admin%20avatar%20cartoon%20style%20business%20person%20with%20tie%2C%20friendly%20smile%2C%20digital%20art&width=36&height=36&seq=admin&orientation=squarish'
-      },
-      'user': {
-        id: 2,
-        name: 'Emma',
-        username: 'emma',
-        email: 'user@nextgen.com',
-        password: 'user123',
-        role: 'user',
-        avatar: 'https://readdy.ai/api/search-image?query=cute%20cartoon%20avatar%20of%20a%20young%20student%20with%20headphones%2C%20simple%20background%2C%20friendly%20smile%2C%20digital%20art%20style&width=36&height=36&seq=user&orientation=squarish'
+  const login = async (userData) => {
+    try {
+      console.log('🔐 Attempting login with:', { email: userData.email });
+      
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userData.email,
+          password: userData.password
+        })
+      });
+
+      console.log('📡 Response status:', response.status);
+      const data = await response.json();
+      console.log('📦 Response data:', data);
+
+      if (response.ok && data.success) {
+        // Đăng nhập thành công
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        setIsAuthenticated(true);
+        setUser(data.user);
+        console.log('✅ Login successful:', data.user);
+        return { success: true, user: data.user };
+      } else {
+        // Đăng nhập thất bại
+        console.log('❌ Login failed:', data);
+        return { 
+          success: false, 
+          error: data.message || data.error || 'Đăng nhập thất bại' 
+        };
       }
-    };
-
-    // Kiểm tra tài khoản mẫu - hỗ trợ cả username và email
-    const userInfo = mockUsers[userData.email] || mockUsers[userData.username];
-    
-    if (userInfo && userData.password === userInfo.password) {
-      // Đăng nhập thành công với tài khoản mẫu
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      const { password, ...userWithoutPassword } = userInfo; // Loại bỏ password khỏi user object
-      localStorage.setItem('authToken', mockToken);
-      localStorage.setItem('user', JSON.stringify(userWithoutPassword));
-      
-      setIsAuthenticated(true);
-      setUser(userWithoutPassword);
-      return { success: true, user: userWithoutPassword };
-    } else if (userInfo && userData.password !== userInfo.password) {
-      // Sai mật khẩu
-      return { success: false, error: 'Mật khẩu không đúng' };
-    } else {
-      // Tài khoản mới - mặc định là user (cho phép đăng nhập với bất kỳ mật khẩu)
-      const mockToken = 'mock-jwt-token-' + Date.now();
-      const newUserInfo = {
-        id: Date.now(),
-        name: userData.email?.split('@')[0] || userData.username || 'User',
-        username: userData.username || userData.email?.split('@')[0] || 'user',
-        email: userData.email || `${userData.username}@nextgen.com`,
-        role: 'user',
-        avatar: 'https://readdy.ai/api/search-image?query=cute%20cartoon%20avatar%20of%20a%20young%20student%20with%20headphones%2C%20simple%20background%2C%20friendly%20smile%2C%20digital%20art%20style&width=36&height=36&seq=newuser&orientation=squarish'
+    } catch (error) {
+      console.error('💥 Login error:', error);
+      return { 
+        success: false, 
+        error: 'Không thể kết nối đến server' 
       };
+    }
+  };
 
-      localStorage.setItem('authToken', mockToken);
-      localStorage.setItem('user', JSON.stringify(newUserInfo));
-      
-      setIsAuthenticated(true);
-      setUser(newUserInfo);
-      return { success: true, user: newUserInfo };
+  const register = async (userData) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: userData.name,
+          username: userData.username,
+          email: userData.email,
+          password: userData.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Đăng ký thành công - tự động đăng nhập
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        setIsAuthenticated(true);
+        setUser(data.user);
+        return { success: true, user: data.user };
+      } else {
+        // Đăng ký thất bại
+        return { 
+          success: false, 
+          error: data.message || data.error || 'Đăng ký thất bại' 
+        };
+      }
+    } catch (error) {
+      console.error('Register error:', error);
+      return { 
+        success: false, 
+        error: 'Không thể kết nối đến server' 
+      };
     }
   };
 
@@ -100,6 +126,7 @@ export const AuthProvider = ({ children }) => {
     user,
     loading,
     login,
+    register,
     logout
   };
 

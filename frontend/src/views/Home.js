@@ -1,10 +1,23 @@
 import React from "react";
+import { useAuth } from "../models/AuthContext";
 
 function Home() {
+  const { isAuthenticated } = useAuth();
+
+  const handleLearnNowClick = () => {
+    if (isAuthenticated) {
+      // Đã đăng nhập - chuyển đến tab bài học
+      window.location.hash = "#/videos";
+    } else {
+      // Chưa đăng nhập - chuyển đến trang đăng nhập
+      window.location.hash = "#/login";
+    }
+  };
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden min-h-screen flex items-center">
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
             src="https://readdy.ai/api/search-image?query=Colorful%20cartoon%20illustration%20of%20happy%20diverse%20children%20learning%20English%20with%20books%20and%20tablets%2C%20surrounded%20by%20floating%20English%20letters%20and%20words%2C%20bright%20cheerful%20background%20with%20blue%2C%20yellow%2C%20pink%20and%20green%20colors%2C%20fun%20educational%20setting&width=1440&height=600&seq=hero1&orientation=landscape"
@@ -13,158 +26,435 @@ function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/80 to-transparent"></div>
         </div>
+        
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 z-5 opacity-30">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-yellow-400/30 to-orange-500/30 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-pink-400/30 to-purple-500/30 rounded-full blur-lg animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 right-10 w-20 h-20 bg-gradient-to-r from-green-400/30 to-emerald-500/30 rounded-full blur-md animate-pulse" style={{ animationDelay: '3s' }}></div>
+        </div>
+
         <div className="container mx-auto px-4 py-12 sm:py-16 md:py-24 lg:py-32 relative z-10">
-          <div className="max-w-2xl mx-auto lg:mx-0 lg:max-w-xl text-white text-center lg:text-left">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 leading-tight">
-              Học Tiếng Anh Qua Video Tương Tác
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-5 sm:mb-6 md:mb-8 leading-relaxed opacity-90 max-w-lg mx-auto lg:mx-0">
-              Khám phá thư viện video học tiếng Anh phong phú, từ cơ bản đến nâng cao. Mua từng video theo nhu cầu học tập!
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-center lg:justify-start max-w-md mx-auto lg:mx-0">
-              <button className="w-full sm:w-auto bg-yellow-400 hover:bg-yellow-500 text-blue-900 py-3 md:py-4 px-5 sm:px-6 md:px-8 rounded-full text-sm sm:text-base md:text-lg font-bold transition duration-300 cursor-pointer shadow-lg hover:shadow-xl min-h-[44px] touch-manipulation">
-                Khám phá video
-              </button>
-              <button className="w-full sm:w-auto bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border border-white/50 py-3 md:py-4 px-5 sm:px-6 md:px-8 rounded-full text-sm sm:text-base md:text-lg font-bold transition duration-300 cursor-pointer min-h-[44px] touch-manipulation">
-                Xem video miễn phí
-              </button>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Content */}
+            <div className="lg:col-span-7 text-white text-center lg:text-left">
+              <div className="space-y-2 mb-6">
+                <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium border border-white/30">
+                  <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                  Chương trình học hiện đối mới nhất 2025
+                </div>
+              </div>
+              
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight">
+                <span className="block">Học Tiếng Anh</span>
+                <span className="block bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                  Qua Bài Học Tương Tác
+                </span>
+              </h1>
+              
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 leading-relaxed opacity-90 max-w-2xl mx-auto lg:mx-0">
+                Khám phá thư viện bài học tiếng Anh phong phú, từ cơ bản đến nâng cao. 
+                <span className="block mt-2 font-semibold text-yellow-300">Sở hữu từng bài học theo nhu cầu học tập!</span>
+              </p>
+              
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-4 mb-8 max-w-md mx-auto lg:mx-0">
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl font-bold text-yellow-300">500+</div>
+                  <div className="text-sm opacity-80">Bài học</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl font-bold text-yellow-300">1000+</div>
+                  <div className="text-sm opacity-80">Học viên</div>
+                </div>
+                <div className="text-center lg:text-left">
+                  <div className="text-2xl font-bold text-yellow-300">4.9⭐</div>
+                  <div className="text-sm opacity-80">Đánh giá</div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start max-w-2xl mx-auto lg:mx-0">
+                <a href="#/videos" className="group w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-blue-900 py-4 px-8 rounded-2xl text-base md:text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-yellow-500/25 hover:scale-105 min-h-[56px] touch-manipulation inline-flex items-center justify-center">
+                  <span className="flex items-center justify-center space-x-2">
+                    <span>🚀</span>
+                    <span>Khám phá bài học</span>
+                    <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                  </span>
+                </a>
+                <button 
+                  onClick={handleLearnNowClick}
+                  className="w-full sm:w-auto bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-2 border-white/50 hover:border-white/70 py-4 px-8 rounded-2xl text-base md:text-lg font-bold transition-all duration-300 hover:scale-105 min-h-[56px] touch-manipulation"
+                >
+                  <span className="flex items-center justify-center space-x-2">
+                    <span>▶️</span>
+                    <span>{isAuthenticated ? "Học ngay" : "Đăng nhập để học"}</span>
+                  </span>
+                </button>
+                <a href="#/teacher-preview" className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 px-8 rounded-2xl text-base md:text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-green-500/25 hover:scale-105 min-h-[56px] touch-manipulation inline-flex items-center justify-center">
+                  <span className="flex items-center justify-center space-x-2">
+                    <span>🎓</span>
+                    <span>Teacher UI/UX</span>
+                    <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+            {/* Interactive Elements */}
+            <div className="lg:col-span-5 hidden lg:block relative">
+              <div className="relative">
+                {/* Floating Cards */}
+                <div className="absolute -top-10 -right-10 bg-white/20 backdrop-blur-lg rounded-2xl p-4 border border-white/30 animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">A</div>
+                    <span className="text-white font-medium">Alphabet</span>
+                  </div>
+                </div>
+                
+                <div className="absolute top-20 -left-10 bg-white/20 backdrop-blur-lg rounded-2xl p-4 border border-white/30 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white">🎵</div>
+                    <span className="text-white font-medium">Phonics</span>
+                  </div>
+                </div>
+                
+                <div className="absolute bottom-10 right-0 bg-white/20 backdrop-blur-lg rounded-2xl p-4 border border-white/30 animate-bounce" style={{ animationDelay: '2s', animationDuration: '3s' }}>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-red-600 rounded-full flex items-center justify-center text-white">💬</div>
+                    <span className="text-white font-medium">Speaking</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Teacher Preview Banner */}
+      <section className="py-8 bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-green-400/30 to-emerald-500/30 animate-pulse"></div>
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center">
+            <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium border border-white/30 mb-4">
+              <span className="w-2 h-2 bg-yellow-300 rounded-full mr-2 animate-pulse"></span>
+              🆕 TÍNH NĂNG MỚI
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-3">
+              🎓 Khám phá giao diện Teacher Dashboard
+            </h2>
+            <p className="text-green-100 mb-4 max-w-2xl mx-auto">
+              Trải nghiệm đầy đủ tính năng tạo bài học, quản lý video, và upload content cho giảng viên!
+            </p>
+            <a href="#/teacher-preview" className="inline-flex items-center space-x-2 bg-white text-green-600 hover:bg-gray-100 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-lg">
+              <span>🚀</span>
+              <span>Xem Demo Teacher UI/UX</span>
+              <i className="ri-arrow-right-line"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
-      <section className="py-8 sm:py-12 md:py-16 lg:py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-12 leading-tight">
-            Tại sao chọn <span className="text-blue-500">NextGen English</span>?
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-            <div className="bg-blue-50 rounded-xl p-4 sm:p-6 md:p-8 text-center transition-transform hover:scale-105 duration-300 shadow-sm hover:shadow-md">
-              <div className="text-2xl sm:text-3xl md:text-4xl text-blue-500 mb-2 sm:mb-3 md:mb-4 flex justify-center">
-                <i className="ri-graduation-cap-line"></i>
-              </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-bold mb-2 md:mb-3">Phương pháp học hiệu quả</h3>
-              <p className="text-gray-600 text-xs sm:text-sm md:text-base leading-relaxed">
-                Phương pháp giảng dạy tương tác giúp trẻ tiếp thu kiến thức nhanh chóng và hiệu quả.
-              </p>
+      <section className="py-16 md:py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-gradient-to-r from-blue-400/20 to-purple-500/20 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-40 h-40 bg-gradient-to-r from-pink-400/20 to-orange-500/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-6">
+              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+              Tại sao chọn chúng tôi?
             </div>
-            <div className="bg-pink-50 rounded-xl p-4 sm:p-6 md:p-8 text-center transition-transform hover:scale-105 duration-300 shadow-sm hover:shadow-md">
-              <div className="text-2xl sm:text-3xl md:text-4xl text-pink-500 mb-2 sm:mb-3 md:mb-4 flex justify-center">
-                <i className="ri-team-line"></i>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              Tại sao chọn{' '}
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+                NextGen English
+              </span>
+              ?
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Khám phá những lý do khiến hàng ngàn phụ huynh và học sinh tin tưởng chọn chúng tôi
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg: gap-8 lg:gap-12">
+            {/* Feature 1 */}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 text-center transition-all duration-500 hover:scale-105 hover:shadow-2xl border border-white/20">
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto transform transition-transform group-hover:rotate-12 group-hover:scale-110">
+                    <i className="ri-graduation-cap-line text-3xl text-white"></i>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <span className="text-xs">✨</span>
+                  </div>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-4 text-gray-800">Phương pháp học hiệu quả</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Phương pháp giảng dạy tương tác hiện đại, kết hợp công nghệ AI giúp trẻ tiếp thu kiến thức nhanh chóng và hiệu quả.
+                </p>
+                <div className="mt-6 text-blue-500 font-semibold">
+                  Tăng 95% hiệu quả học tập →
+                </div>
               </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-bold mb-2 md:mb-3">Giáo viên chuyên nghiệp</h3>
-              <p className="text-gray-600 text-xs sm:text-sm md:text-base leading-relaxed">
-                Đội ngũ giáo viên giàu kinh nghiệm, nhiệt tình và am hiểu tâm lý trẻ em.
-              </p>
             </div>
-            <div className="bg-green-50 rounded-xl p-4 sm:p-6 md:p-8 text-center transition-transform hover:scale-105 duration-300 shadow-sm hover:shadow-md sm:col-span-2 lg:col-span-1">
-              <div className="text-2xl sm:text-3xl md:text-4xl text-green-500 mb-2 sm:mb-3 md:mb-4 flex justify-center">
-                <i className="ri-gamepad-line"></i>
+
+            {/* Feature 2
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 text-center transition-all duration-500 hover:scale-105 hover:shadow-2xl border border-white/20">
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center mx-auto transform transition-transform group-hover:rotate-12 group-hover:scale-110">
+                    <i className="ri-team-line text-3xl text-white"></i>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <span className="text-xs">👨‍🏫</span>
+                  </div>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-4 text-gray-800">Giáo viên chuyên nghiệp</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Đội ngũ giáo viên bản ngữ và Việt Nam giàu kinh nghiệm, được đào tạo chuyên sâu về tâm lý và phương pháp giảng dạy trẻ em.
+                </p>
+                <div className="mt-6 text-pink-500 font-semibold">
+                  100% giáo viên chứng chỉ →
+                </div>
               </div>
-              <h3 className="text-base sm:text-lg md:text-xl font-bold mb-2 md:mb-3">Học qua trò chơi</h3>
-              <p className="text-gray-600 text-xs sm:text-sm md:text-base leading-relaxed">
-                Các bài học được thiết kế dưới dạng trò chơi giúp trẻ học mà chơi, chơi mà học.
-              </p>
+            </div> */}
+
+            {/* Feature 3 */}
+            <div className="group relative md:col-span-2 lg:col-span-1">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 text-center transition-all duration-500 hover:scale-105 hover:shadow-2xl border border-white/20">
+                <div className="relative mb-6">
+                  <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto transform transition-transform group-hover:rotate-12 group-hover:scale-110">
+                    <i className="ri-gamepad-line text-3xl text-white"></i>
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <span className="text-xs">🎮</span>
+                  </div>
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-4 text-gray-800">Học qua trò chơi</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Gamification với hệ thống thưởng, level up và achievement giúp trẻ luôn hứng thú và động lực trong quá trình học tập.
+                </p>
+                <div className="mt-6 text-green-500 font-semibold">
+                  500+ mini games tương tác →
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Benefits */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-2">24/7</div>
+              <div className="text-gray-600 text-sm">Hỗ trợ học tập</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600 mb-2">100%</div>
+              <div className="text-gray-600 text-sm">Hoàn tiền nếu không hài lòng</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-2">AI</div>
+              <div className="text-gray-600 text-sm">Đánh giá tiến độ thông minh</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-orange-600 mb-2">∞</div>
+              <div className="text-gray-600 text-sm">Truy cập không giới hạn</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Course Categories */}
-      <section className="py-12 md:py-16 lg:py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-3 md:mb-4">Khóa học theo chủ đề</h2>
-          <p className="text-center text-gray-600 text-sm md:text-base mb-8 md:mb-12 max-w-2xl mx-auto leading-relaxed">
-            Các khóa học được thiết kế phù hợp với từng độ tuổi và nhu cầu của trẻ, giúp phát triển toàn diện các kỹ năng tiếng Anh.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      <section className="py-20 md:py-28 bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-pink-500/20 to-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-semibold mb-6 border border-white/20">
+              <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+              Chương trình học đa dạng
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              <span className="block">Bài Học Theo</span>
+              <span className="bg-gradient-to-r from-yellow-300 via-pink-300 to-cyan-300 bg-clip-text text-transparent">
+                Kỹ Năng Cốt Lõi
+              </span>
+            </h2>
+            <p className="text-lg text-white/80 max-w-3xl mx-auto leading-relaxed">
+              Phát triển toàn diện 4 kỹ năng tiếng Anh với phương pháp học tập hiện đại và tương tác
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
             {/* Speaking */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-              <div className="h-48 overflow-hidden">
-                <img
-                  src="https://readdy.ai/api/search-image?query=Cartoon%20children%20practicing%20English%20speaking%20with%20speech%20bubbles%2C%20colorful%20classroom%20setting%20with%20educational%20posters%2C%20bright%20and%20cheerful%20atmosphere%20with%20blue%20and%20yellow%20colors%2C%20kids%20engaged%20in%20conversation&width=400&height=300&seq=speaking1&orientation=landscape"
-                  alt="Speaking Course"
-                  className="w-full h-full object-cover object-top transition-transform duration-500 hover:scale-110"
-                />
-              </div>
-              <div className="p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 space-y-2 sm:space-y-0">
-                  <h3 className="text-lg md:text-xl font-bold text-blue-600">Speaking</h3>
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 md:px-3 py-1 rounded-full self-start sm:self-auto">4-12 tuổi</span>
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+              <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/20 transition-all duration-500 hover:scale-105 hover:bg-white/20">
+                <div className="h-48 overflow-hidden relative">
+                  <img
+                    src="https://readdy.ai/api/search-image?query=Cartoon%20children%20practicing%20English%20speaking%20with%20speech%20bubbles%2C%20colorful%20classroom%20setting%20with%20educational%20posters%2C%20bright%20and%20cheerful%20atmosphere%20with%20blue%20and%20yellow%20colors%2C%20kids%20engaged%20in%20conversation&width=400&height=300&seq=speaking1&orientation=landscape"
+                    alt="Speaking Course"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4">
+                    <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
+                      <i className="ri-mic-line text-xl text-white"></i>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-gray-600 text-sm md:text-base mb-3 md:mb-4 leading-relaxed">
-                  Rèn luyện kỹ năng giao tiếp, phát âm và tự tin nói tiếng Anh qua các hoạt động thú vị.
-                </p>
-                <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 md:py-3 px-4 rounded-lg transition duration-300 cursor-pointer text-sm md:text-base font-medium">
-                  Xem chi tiết
-                </button>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-xl font-bold text-white">Speaking</h3>
+                    <span className="bg-blue-500/20 text-blue-300 text-xs px-3 py-1 rounded-full border border-blue-500/30">4-12 tuổi</span>
+                  </div>
+                  <p className="text-white/80 text-sm mb-4 leading-relaxed">
+                    Rèn luyện kỹ năng giao tiếp, phát âm chuẩn và tự tin nói tiếng Anh.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-white/60">
+                      <span className="flex items-center">
+                        <i className="ri-play-circle-line mr-1"></i>
+                        50+ bài học
+                      </span>
+                    </div>
+                    <button className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105 border border-white/20">
+                      Học ngay
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
             {/* Listening */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-              <div className="h-48 overflow-hidden">
-                <img
-                  src="https://readdy.ai/api/search-image?query=Cartoon%20children%20wearing%20headphones%20listening%20to%20English%20audio%20lessons%2C%20colorful%20classroom%20with%20sound%20wave%20visuals%2C%20educational%20setting%20with%20listening%20activities%2C%20bright%20and%20cheerful%20atmosphere%20with%20pink%20and%20blue%20colors&width=400&height=300&seq=listening1&orientation=landscape"
-                  alt="Listening Course"
-                  className="w-full h-full object-cover object-top transition-transform duration-500 hover:scale-110"
-                />
-              </div>
-              <div className="p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 space-y-2 sm:space-y-0">
-                  <h3 className="text-lg md:text-xl font-bold text-pink-600">Listening</h3>
-                  <span className="bg-pink-100 text-pink-800 text-xs px-2 md:px-3 py-1 rounded-full self-start sm:self-auto">4-12 tuổi</span>
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+              <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/20 transition-all duration-500 hover:scale-105 hover:bg-white/20">
+                <div className="h-48 overflow-hidden relative">
+                  <img
+                    src="https://readdy.ai/api/search-image?query=Cartoon%20children%20wearing%20headphones%20listening%20to%20English%20audio%20lessons%2C%20colorful%20classroom%20with%20sound%20wave%20visuals%2C%20educational%20setting%20with%20listening%20activities%2C%20bright%20and%20cheerful%20atmosphere%20with%20pink%20and%20blue%20colors&width=400&height=300&seq=listening1&orientation=landscape"
+                    alt="Listening Course"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4">
+                    <div className="w-12 h-12 bg-pink-500 rounded-2xl flex items-center justify-center">
+                      <i className="ri-headphone-line text-xl text-white"></i>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-gray-600 text-sm md:text-base mb-3 md:mb-4 leading-relaxed">
-                  Phát triển khả năng nghe hiểu thông qua các bài nghe sinh động và thú vị.
-                </p>
-                <button className="w-full bg-pink-500 hover:bg-pink-600 text-white py-2 md:py-3 px-4 rounded-lg transition duration-300 cursor-pointer text-sm md:text-base font-medium">
-                  Xem chi tiết
-                </button>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-xl font-bold text-white">Listening</h3>
+                    <span className="bg-pink-500/20 text-pink-300 text-xs px-3 py-1 rounded-full border border-pink-500/30">4-12 tuổi</span>
+                  </div>
+                  <p className="text-white/80 text-sm mb-4 leading-relaxed">
+                    Phát triển khả năng nghe hiểu qua các bài nghe sinh động và thú vị.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-white/60">
+                      <span className="flex items-center">
+                        <i className="ri-play-circle-line mr-1"></i>
+                        40+ bài học
+                      </span>
+                    </div>
+                    <button className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105 border border-white/20">
+                      Học ngay
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
+
             {/* Reading */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-              <div className="h-48 overflow-hidden">
-                <img
-                  src="https://readdy.ai/api/search-image?query=Cartoon%20children%20reading%20English%20books%20in%20a%20colorful%20library%20setting%2C%20educational%20environment%20with%20bookshelves%20and%20reading%20corners%2C%20bright%20and%20cheerful%20atmosphere%20with%20green%20and%20yellow%20colors%2C%20kids%20engaged%20in%20reading%20activities&width=400&height=300&seq=reading1&orientation=landscape"
-                  alt="Reading Course"
-                  className="w-full h-full object-cover object-top transition-transform duration-500 hover:scale-110"
-                />
-              </div>
-              <div className="p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 space-y-2 sm:space-y-0">
-                  <h3 className="text-lg md:text-xl font-bold text-green-600">Reading</h3>
-                  <span className="bg-green-100 text-green-800 text-xs px-2 md:px-3 py-1 rounded-full self-start sm:self-auto">4-12 tuổi</span>
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+              <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/20 transition-all duration-500 hover:scale-105 hover:bg-white/20">
+                <div className="h-48 overflow-hidden relative">
+                  <img
+                    src="https://readdy.ai/api/search-image?query=Cartoon%20children%20reading%20English%20books%20in%20a%20colorful%20library%20setting%2C%20educational%20environment%20with%20bookshelves%20and%20reading%20corners%2C%20bright%20and%20cheerful%20atmosphere%20with%20green%20and%20yellow%20colors%2C%20kids%20engaged%20in%20reading%20activities&width=400&height=300&seq=reading1&orientation=landscape"
+                    alt="Reading Course"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4">
+                    <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center">
+                      <i className="ri-book-open-line text-xl text-white"></i>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-gray-600 text-sm md:text-base mb-3 md:mb-4 leading-relaxed">
-                  Nâng cao kỹ năng đọc hiểu qua các truyện ngắn và bài đọc phù hợp với lứa tuổi.
-                </p>
-                <button className="w-full bg-green-500 hover:bg-green-600 text-white py-2 md:py-3 px-4 rounded-lg transition duration-300 cursor-pointer text-sm md:text-base font-medium">
-                  Xem chi tiết
-                </button>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-xl font-bold text-white">Reading</h3>
+                    <span className="bg-green-500/20 text-green-300 text-xs px-3 py-1 rounded-full border border-green-500/30">4-12 tuổi</span>
+                  </div>
+                  <p className="text-white/80 text-sm mb-4 leading-relaxed">
+                    Nâng cao kỹ năng đọc hiểu qua truyện ngắn và bài đọc phù hợp.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-white/60">
+                      <span className="flex items-center">
+                        <i className="ri-play-circle-line mr-1"></i>
+                        60+ bài học
+                      </span>
+                    </div>
+                    <button className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105 border border-white/20">
+                      Học ngay
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
+
             {/* Writing */}
-            <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-              <div className="h-48 overflow-hidden">
-                <img
-                  src="https://readdy.ai/api/search-image?query=Cartoon%20children%20writing%20in%20English%20notebooks%20at%20colorful%20desks%2C%20educational%20classroom%20with%20writing%20prompts%20and%20vocabulary%20charts%2C%20bright%20and%20cheerful%20atmosphere%20with%20purple%20and%20blue%20colors%2C%20kids%20engaged%20in%20creative%20writing%20activities&width=400&height=300&seq=writing1&orientation=landscape"
-                  alt="Writing Course"
-                  className="w-full h-full object-cover object-top transition-transform duration-500 hover:scale-110"
-                />
-              </div>
-              <div className="p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 space-y-2 sm:space-y-0">
-                  <h3 className="text-lg md:text-xl font-bold text-purple-600">Writing</h3>
-                  <span className="bg-purple-100 text-purple-800 text-xs px-2 md:px-3 py-1 rounded-full self-start sm:self-auto">4-12 tuổi</span>
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-violet-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"></div>
+              <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl overflow-hidden border border-white/20 transition-all duration-500 hover:scale-105 hover:bg-white/20">
+                <div className="h-48 overflow-hidden relative">
+                  <img
+                    src="https://readdy.ai/api/search-image?query=Cartoon%20children%20writing%20in%20English%20notebooks%20at%20colorful%20desks%2C%20educational%20classroom%20with%20writing%20prompts%20and%20vocabulary%20charts%2C%20bright%20and%20cheerful%20atmosphere%20with%20purple%20and%20blue%20colors%2C%20kids%20engaged%20in%20creative%20writing%20activities&width=400&height=300&seq=writing1&orientation=landscape"
+                    alt="Writing Course"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4">
+                    <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center">
+                      <i className="ri-edit-line text-xl text-white"></i>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-gray-600 text-sm md:text-base mb-3 md:mb-4 leading-relaxed">
-                  Rèn luyện kỹ năng viết từ cơ bản đến nâng cao qua các bài tập thực hành thú vị.
-                </p>
-                <button className="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 md:py-3 px-4 rounded-lg transition duration-300 cursor-pointer text-sm md:text-base font-medium">
-                  Xem chi tiết
-                </button>
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-xl font-bold text-white">Writing</h3>
+                    <span className="bg-purple-500/20 text-purple-300 text-xs px-3 py-1 rounded-full border border-purple-500/30">4-12 tuổi</span>
+                  </div>
+                  <p className="text-white/80 text-sm mb-4 leading-relaxed">
+                    Rèn luyện kỹ năng viết từ cơ bản đến nâng cao một cách thú vị.
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-white/60">
+                      <span className="flex items-center">
+                        <i className="ri-play-circle-line mr-1"></i>
+                        45+ bài học
+                      </span>
+                    </div>
+                    <button className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-105 border border-white/20">
+                      Học ngay
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -172,93 +462,279 @@ function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-8 sm:py-12 md:py-16 lg:py-20 bg-blue-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-center mb-6 sm:mb-8 md:mb-12">Phụ huynh và học sinh nói gì về chúng tôi</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            <div className="bg-white p-6 md:p-8 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-              <div className="flex items-center mb-3 md:mb-4">
-                <img
-                  src="https://readdy.ai/api/search-image?query=Portrait%20of%20Vietnamese%20mother%20with%20child%2C%20happy%20family%20photo%2C%20natural%20lighting%2C%20clean%20background&width=60&height=60&seq=parent1&orientation=squarish"
-                  alt="Parent"
-                  className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover mr-3 md:mr-4"
-                />
-                <div>
-                  <h4 className="font-bold text-sm md:text-base">Chị Thiên An</h4>
-                  <p className="text-gray-600 text-xs md:text-sm">Phụ huynh học sinh</p>
+      <section className="py-20 md:py-28 bg-gradient-to-br from-white via-blue-50 to-purple-50 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute top-10 left-10 w-40 h-40 bg-gradient-to-r from-blue-400/20 to-cyan-500/20 rounded-full blur-2xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 bg-gradient-to-r from-purple-400/20 to-pink-500/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center px-6 py-3 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold mb-6">
+              <span className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></span>
+              Phản hồi từ cộng đồng
+            </div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-gray-800">
+              <span className="block">Phụ huynh và học sinh</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+                nói gì về chúng tôi
+              </span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Hàng nghìn phụ huynh và học sinh đã tin tưởng lựa chọn NextGen English
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            {/* Testimonial 1 */}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-white/20">
+                <div className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg">💙</span>
                 </div>
-              </div>
-              <p className="text-gray-600 italic text-sm md:text-base leading-relaxed mb-3 md:mb-4">
-                "Con tôi học tại NextGen English được 6 tháng và đã có tiến bộ rõ rệt. Các thầy cô rất nhiệt tình và phương pháp giảng dạy vui nhộn khiến con rất thích thú với việc học tiếng Anh."
-              </p>
-              <div className="flex text-yellow-400 space-x-1">
-                <i className="ri-star-fill text-sm md:text-base"></i>
-                <i className="ri-star-fill text-sm md:text-base"></i>
-                <i className="ri-star-fill text-sm md:text-base"></i>
-                <i className="ri-star-fill text-sm md:text-base"></i>
-                <i className="ri-star-fill text-sm md:text-base"></i>
+                <div className="flex items-center mb-6">
+                  <div className="relative">
+                    <img
+                      src="https://readdy.ai/api/search-image?query=Portrait%20of%20Vietnamese%20mother%20with%20child%2C%20happy%20family%20photo%2C%20natural%20lighting%2C%20clean%20background&width=60&height=60&seq=parent1&orientation=squarish"
+                      alt="Parent"
+                      className="w-14 h-14 rounded-2xl object-cover ring-4 ring-blue-100"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h4 className="font-bold text-lg text-gray-800">Chị Thiên An</h4>
+                    <p className="text-blue-600 text-sm font-medium">Phụ huynh học sinh</p>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <p className="text-gray-700 italic text-base leading-relaxed">
+                    "Con tôi học tại NextGen English được 6 tháng và đã có tiến bộ rõ rệt. Các thầy cô rất nhiệt tình và phương pháp giảng dạy vui nhộn khiến con rất thích thú với việc học tiếng Anh."
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex text-yellow-400 space-x-1">
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                  </div>
+                  <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    6 tháng trước
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="bg-white p-8 rounded-xl shadow-md">
-              <div className="flex items-center mb-4">
-                <img
-                  src="https://readdy.ai/api/search-image?query=Portrait%20of%20Vietnamese%20father%20with%20child%2C%20happy%20family%20photo%2C%20natural%20lighting%2C%20clean%20background&width=60&height=60&seq=parent2&orientation=squarish"
-                  alt="Parent"
-                  className="w-12 h-12 rounded-full object-cover mr-4"
-                />
-                <div>
-                  <h4 className="font-bold">Anh Phương Tuấn</h4>
-                  <p className="text-gray-600 text-sm">Phụ huynh học sinh</p>
+
+            {/* Testimonial 2 */}
+            <div className="group relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-white/20">
+                <div className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg">💜</span>
                 </div>
-              </div>
-              <p className="text-gray-600 italic">
-                "Tôi rất hài lòng với sự tiến bộ của con. Đặc biệt là kỹ năng giao tiếp đã cải thiện rõ rệt. Giáo viên rất tận tâm và luôn cập nhật tình hình học tập của con cho chúng tôi."
-              </p>
-              <div className="mt-4 text-yellow-400 flex">
-                <i className="fas fa-star"></i>
-                <i className="fas fa-star"></i>
-                <i className="fas fa-star"></i>
-                <i className="fas fa-star"></i>
-                <i className="fas fa-star-half-alt"></i>
+                <div className="flex items-center mb-6">
+                  <div className="relative">
+                    <img
+                      src="https://readdy.ai/api/search-image?query=Portrait%20of%20Vietnamese%20father%20with%20child%2C%20happy%20family%20photo%2C%20natural%20lighting%2C%20clean%20background&width=60&height=60&seq=parent2&orientation=squarish"
+                      alt="Parent"
+                      className="w-14 h-14 rounded-2xl object-cover ring-4 ring-purple-100"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h4 className="font-bold text-lg text-gray-800">Anh Phương Tuấn</h4>
+                    <p className="text-purple-600 text-sm font-medium">Phụ huynh học sinh</p>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <p className="text-gray-700 italic text-base leading-relaxed">
+                    "Tôi rất hài lòng với sự tiến bộ của con. Đặc biệt là kỹ năng giao tiếp đã cải thiện rõ rệt. Giáo viên rất tận tâm và luôn cập nhật tình hình học tập cho chúng tôi."
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex text-yellow-400 space-x-1">
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-half-line text-lg"></i>
+                  </div>
+                  <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    3 tháng trước
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="bg-white p-8 rounded-xl shadow-md">
-              <div className="flex items-center mb-4">
-                <img
-                  src="https://readdy.ai/api/search-image?query=Portrait%20of%20Vietnamese%20child%20student%20smiling%2C%20happy%20expression%2C%20natural%20lighting%2C%20clean%20background&width=60&height=60&seq=student1&orientation=squarish"
-                  alt="Student"
-                  className="w-12 h-12 rounded-full object-cover mr-4"
-                />
-                <div>
-                  <h4 className="font-bold">Bé Sol</h4>
-                  <p className="text-gray-600 text-sm">Học sinh lớp 4</p>
+
+            {/* Testimonial 3 */}
+            <div className="group relative md:col-span-2 lg:col-span-1">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-white/20">
+                <div className="absolute -top-4 -right-4 w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg">💚</span>
+                </div>
+                <div className="flex items-center mb-6">
+                  <div className="relative">
+                    <img
+                      src="https://readdy.ai/api/search-image?query=Portrait%20of%20Vietnamese%20child%20student%20smiling%2C%20happy%20expression%2C%20natural%20lighting%2C%20clean%20background&width=60&height=60&seq=student1&orientation=squarish"
+                      alt="Student"
+                      className="w-14 h-14 rounded-2xl object-cover ring-4 ring-green-100"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full border-2 border-white flex items-center justify-center">
+                      <span className="text-white text-xs">⭐</span>
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h4 className="font-bold text-lg text-gray-800">Bé Sol</h4>
+                    <p className="text-green-600 text-sm font-medium">Học sinh lớp 4</p>
+                  </div>
+                </div>
+                <div className="mb-6">
+                  <p className="text-gray-700 italic text-base leading-relaxed">
+                    "Em rất thích học tiếng Anh ở đây. Các cô giáo dạy rất vui và em được chơi nhiều trò chơi. Em đã có thể nói chuyện với bạn nước ngoài và hiểu phim hoạt hình tiếng Anh!"
+                  </p>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex text-yellow-400 space-x-1">
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                    <i className="ri-star-fill text-lg"></i>
+                  </div>
+                  <div className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    1 tháng trước
+                  </div>
                 </div>
               </div>
-              <p className="text-gray-600 italic">
-                "Em rất thích học tiếng Anh ở đây. Các cô giáo dạy rất vui và em được chơi nhiều trò chơi. Em đã có thể nói chuyện với bạn nước ngoài và hiểu được phim hoạt hình tiếng Anh."
-              </p>
-              <div className="mt-4 text-yellow-400 flex">
-                <i className="fas fa-star"></i>
-                <i className="fas fa-star"></i>
-                <i className="fas fa-star"></i>
-                <i className="fas fa-star"></i>
-                <i className="fas fa-star"></i>
-              </div>
+            </div>
+          </div>
+
+          {/* Stats Section */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="group">
+              <div className="text-4xl font-bold text-blue-600 mb-2 group-hover:scale-110 transition-transform">4.9/5</div>
+              <div className="text-gray-600 text-sm">Đánh giá trung bình</div>
+            </div>
+            <div className="group">
+              <div className="text-4xl font-bold text-green-600 mb-2 group-hover:scale-110 transition-transform">1000+</div>
+              <div className="text-gray-600 text-sm">Phụ huynh hài lòng</div>
+            </div>
+            <div className="group">
+              <div className="text-4xl font-bold text-purple-600 mb-2 group-hover:scale-110 transition-transform">98%</div>
+              <div className="text-gray-600 text-sm">Tỷ lệ tiến bộ</div>
+            </div>
+            <div className="group">
+              <div className="text-4xl font-bold text-orange-600 mb-2 group-hover:scale-110 transition-transform">24/7</div>
+              <div className="text-gray-600 text-sm">Hỗ trợ tận tình</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Free Trial */}
-      <section className="py-8 sm:py-12 md:py-16 lg:py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-3 sm:mb-4 md:mb-6">Bắt đầu học tiếng Anh ngay hôm nay!</h2>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed opacity-90 px-2">
-            Đăng ký khóa học thử miễn phí và trải nghiệm phương pháp học tiếng Anh hiệu quả tại NextGen English.
-          </p>
-          <button className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 py-3 md:py-4 px-4 sm:px-6 md:px-8 rounded-full text-sm sm:text-base md:text-lg font-bold transition duration-300 cursor-pointer shadow-lg hover:shadow-xl min-h-[44px] touch-manipulation">
-            Đăng ký học thử miễn phí
-          </button>
+      <section className="py-20 md:py-28 bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 text-white relative overflow-hidden">
+        {/* Background Animation */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-0 w-full h-full opacity-20">
+            <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-pink-400/30 to-orange-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-indigo-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+          </div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center">
+            <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-semibold mb-8 border border-white/20">
+              <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+              Chỉ còn 48 giờ để nhận ưu đãi đặc biệt!
+            </div>
+            
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              <span className="block">Bắt đầu hành trình</span>
+              <span className="bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 bg-clip-text text-transparent">
+                học tiếng Anh ngay hôm nay!
+              </span>
+            </h2>
+            
+            <p className="text-lg md:text-xl lg:text-2xl mb-12 max-w-4xl mx-auto leading-relaxed opacity-90">
+              Đăng ký học thử <span className="font-bold text-yellow-300">MIỄN PHÍ</span> và trải nghiệm phương pháp học tiếng Anh 
+              <span className="font-bold text-cyan-300"> hiệu quả nhất</span> tại NextGen English.
+            </p>
+
+            {/* Benefits */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+              <div className="flex items-center justify-center md:justify-start space-x-3 text-left">
+                <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center">
+                  <i className="ri-check-line text-xl text-white"></i>
+                </div>
+                <div>
+                  <div className="font-bold text-lg">Học thử 7 ngày</div>
+                  <div className="text-white/80 text-sm">Hoàn toàn miễn phí</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-center md:justify-start space-x-3 text-left">
+                <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
+                  <i className="ri-user-star-line text-xl text-white"></i>
+                </div>
+                <div>
+                  <div className="font-bold text-lg">Giáo viên 1:1</div>
+                  <div className="text-white/80 text-sm">Hỗ trợ cá nhân hóa</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-center md:justify-start space-x-3 text-left">
+                <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center">
+                  <i className="ri-gift-line text-xl text-white"></i>
+                </div>
+                <div>
+                  <div className="font-bold text-lg">Tặng kèm</div>
+                  <div className="text-white/80 text-sm">Tài liệu học tập</div>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center max-w-lg mx-auto">
+              <button className="group w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-blue-900 py-4 px-8 rounded-2xl text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-yellow-500/25 hover:scale-105 min-h-[60px] touch-manipulation">
+                <span className="flex items-center justify-center space-x-2">
+                  <span>🎉</span>
+                  <span>Đăng ký học thử MIỄN PHÍ</span>
+                  <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
+                </span>
+              </button>
+              
+              <button className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/30 hover:border-white/50 py-4 px-8 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 min-h-[60px] touch-manipulation">
+                <span className="flex items-center justify-center space-x-2">
+                  <i className="ri-phone-line"></i>
+                  <span>Tư vấn miễn phí</span>
+                </span>
+              </button>
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-8 opacity-70">
+              <div className="flex items-center space-x-2">
+                <i className="ri-shield-check-line text-green-400"></i>
+                <span className="text-sm">Không ràng buộc</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <i className="ri-time-line text-blue-400"></i>
+                <span className="text-sm">Hỗ trợ 24/7</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <i className="ri-medal-line text-yellow-400"></i>
+                <span className="text-sm">Cam kết chất lượng</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

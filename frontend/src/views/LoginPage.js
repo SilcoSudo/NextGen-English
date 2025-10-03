@@ -42,17 +42,13 @@ function LoginPage() {
     setError('');
 
     try {
-      // Mock login delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Gọi hàm login từ AuthContext - hỗ trợ cả email và username
-      const loginData = { password, rememberMe };
-      if (email.includes('@')) {
-        loginData.email = email;
-      } else {
-        loginData.username = email; // Sử dụng email field cho cả username
-      }
-      const result = login(loginData);
+      // Gọi hàm login từ AuthContext (đã là async function)
+      const loginData = { 
+        email: email, // API backend sử dụng email field cho cả email và username
+        password: password
+      };
+      
+      const result = await login(loginData);
 
       if (result.success) {
         // Chuyển hướng đến trang đích dựa trên role
@@ -64,7 +60,7 @@ function LoginPage() {
       }
     } catch (error) {
       console.error('Login failed:', error);
-      setError('Có lỗi xảy ra, vui lòng thử lại');
+      setError('Có lỗi xảy ra khi kết nối server');
     } finally {
       setIsLoading(false);
     }

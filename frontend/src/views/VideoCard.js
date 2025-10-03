@@ -90,7 +90,7 @@ function VideoCard({ video }) {
             </div>
             <div className="flex items-center space-x-1">
               <i className="ri-eye-line"></i>
-              <span>{formatViews(video.views)} lượt xem</span>
+              <span>{formatViews(video.views)} lượt học</span>
             </div>
           </div>
         </div>
@@ -99,20 +99,20 @@ function VideoCard({ video }) {
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-blue-600">{video.price}</span>
-            <span className="text-xs text-gray-500">Mua một lần</span>
+            <span className="text-xs text-gray-500">Sở hữu vĩnh viễn</span>
           </div>
           
           {video.isPurchased ? (
             <Link
-              to={`/video/${video.id}/watch`}
+              to={`/lesson/${video.id}/watch`}
               className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center space-x-2"
             >
               <i className="ri-play-circle-line"></i>
-              <span>Xem ngay</span>
+              <span>Học ngay</span>
             </Link>
           ) : (
             <Link
-              to={`/video/${video.id}`}
+              to={`/lesson/${video.id}`}
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition duration-300 flex items-center space-x-2"
             >
               <i className="ri-shopping-cart-line"></i>

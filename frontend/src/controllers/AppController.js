@@ -15,9 +15,12 @@ import ProtectedRoute from "../views/ProtectedRoute";
 import AdminRoute from "../views/admin/AdminRoute";
 import AdminHome from "../views/admin/AdminHome";
 import AdminRedirect from "../views/admin/AdminRedirect";
+import TeacherRoute from "../views/teacher/TeacherRoute";
+import TeacherDashboard from "../views/TeacherDashboard";
 import UserManagement from "../views/UserManagement";
 import CourseManagement from "../views/CourseManagement";
 import RevenueChart from "../views/RevenueChart";
+import TeacherPreview from "../components/TeacherPreview";
 import { AuthProvider } from "../models/AuthContext";
 
 function App() {
@@ -82,6 +85,16 @@ function App() {
               </>
             </ProtectedRoute>
           } />
+          
+          {/* Teacher Routes */}
+          <Route path="/teacher" element={
+            <TeacherRoute>
+              <TeacherDashboard />
+            </TeacherRoute>
+          } />
+          
+          {/* Teacher Preview (Demo UI/UX) */}
+          <Route path="/teacher-preview" element={<TeacherPreview />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={

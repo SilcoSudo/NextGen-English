@@ -79,8 +79,8 @@ function Header() {
               to="/videos"
               className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname.startsWith("/videos") ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
             >
-              <span className="hidden lg:inline">Video học tập</span>
-              <span className="lg:hidden">Video</span>
+              <span className="hidden lg:inline">Bài học</span>
+              <span className="lg:hidden">Bài học</span>
             </Link>
             
             {isAuthenticated && (
@@ -89,7 +89,7 @@ function Header() {
                   to="/my-videos"
                   className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname === "/my-videos" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
                 >
-                  <span className="hidden lg:inline">Video đã mua</span>
+                  <span className="hidden lg:inline">Bài học đã mua</span>
                   <span className="lg:hidden">Đã mua</span>
                 </Link>
                 <Link
@@ -115,8 +115,8 @@ function Header() {
                   to="/admin/videos"
                   className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname === "/admin/videos" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
                 >
-                  <span className="hidden xl:inline">Quản lý video</span>
-                  <span className="xl:hidden">QL Video</span>
+                  <span className="hidden xl:inline">Quản lý bài học</span>
+                  <span className="xl:hidden">QL Bài học</span>
                 </Link>
                 <Link
                   to="/admin/users"
@@ -136,7 +136,7 @@ function Header() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm video..."
+                placeholder="Tìm kiếm bài học..."
                 className="border border-gray-300 rounded-full py-1.5 md:py-2 px-3 md:px-4 pr-8 md:pr-10 text-xs md:text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300 w-24 md:w-32 lg:w-48 xl:w-64 transition-all"
               />
               <button 
@@ -175,7 +175,8 @@ function Header() {
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                     <Link
-                      to={user?.role === 'admin' ? '/admin' : '/dashboard'}
+                      to={user?.role === 'admin' ? '/admin' : 
+                          user?.role === 'teacher' ? '/teacher' : '/dashboard'}
                       className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     >
@@ -217,7 +218,7 @@ function Header() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Tìm kiếm video..."
+                  placeholder="Tìm kiếm bài học..."
                   className="w-full border border-gray-300 rounded-lg py-3 px-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
                 />
                 <button 
@@ -242,8 +243,8 @@ function Header() {
                 className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname.startsWith("/videos") ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
                 onClick={() => setIsMenuOpen(false)}
               >
-                <i className="ri-video-line mr-3"></i>
-                Video học tập
+                <i className="ri-book-open-line mr-3"></i>
+                Bài học
               </Link>
               
               {isAuthenticated && (
@@ -253,8 +254,8 @@ function Header() {
                     className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname === "/my-videos" ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <i className="ri-play-circle-line mr-3"></i>
-                    Video đã mua
+                    <i className="ri-book-mark-line mr-3"></i>
+                    Bài học đã mua
                   </Link>
                   <Link
                     to="/payment"
@@ -265,12 +266,14 @@ function Header() {
                     Thanh toán
                   </Link>
                   <Link
-                    to={user?.role === 'admin' ? '/admin' : '/dashboard'}
+                    to={user?.role === 'admin' ? '/admin' : 
+                        user?.role === 'teacher' ? '/teacher' : '/dashboard'}
                     className="px-4 py-3 rounded-lg font-medium text-sm text-gray-600 hover:bg-gray-50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <i className="ri-dashboard-line mr-3"></i>
-                    {user?.role === 'admin' ? 'Quản lý hệ thống' : 'Dashboard'}
+                    {user?.role === 'admin' ? 'Quản lý hệ thống' : 
+                     user?.role === 'teacher' ? 'Quản lý bài học' : 'Dashboard'}
                   </Link>
                 </>
               )}
@@ -283,8 +286,8 @@ function Header() {
                     className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname === "/admin/videos" ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <i className="ri-video-line mr-3"></i>
-                    Quản lý video
+                    <i className="ri-book-2-line mr-3"></i>
+                    Quản lý bài học
                   </Link>
                   <Link
                     to="/admin/users"
@@ -321,7 +324,8 @@ function Header() {
                   {/* Mobile User Actions */}
                   <div className="space-y-2">
                     <Link
-                      to={user?.role === 'admin' ? '/admin' : '/dashboard'}
+                      to={user?.role === 'admin' ? '/admin' : 
+                          user?.role === 'teacher' ? '/teacher' : '/dashboard'}
                       className="w-full flex items-center space-x-3 px-4 py-3 bg-white hover:bg-blue-50 rounded-lg text-sm font-medium transition duration-300 text-gray-700 hover:text-blue-600 border border-gray-200"
                       onClick={() => setIsMenuOpen(false)}
                     >

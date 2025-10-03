@@ -84,11 +84,11 @@ function ExploreVideos() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-32 pb-12 sm:pb-16 relative z-10">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-3 sm:mb-4 px-2">
-              Video Học Tập Tiếng Anh
+              Bài Học Tiếng Anh
             </h1>
             <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto px-4 leading-relaxed">
-              Khám phá thư viện video học tiếng Anh phong phú, từ cơ bản đến nâng cao. 
-              Mua từng video theo nhu cầu học tập của bạn!
+              Khám phá thư viện bài học tiếng Anh phong phú, từ cơ bản đến nâng cao. 
+              Sở hữu từng bài học theo nhu cầu học tập của bạn!
             </p>
 
             {/* Modern Search Bar */}
@@ -96,7 +96,7 @@ function ExploreVideos() {
               <div className="relative group">
                 <input
                   type="text"
-                  placeholder="Tìm kiếm video theo chủ đề, kỹ năng..."
+                  placeholder="Tìm kiếm bài học theo chủ đề, kỹ năng..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-4 sm:px-6 py-3 sm:py-4 pl-10 sm:pl-14 pr-20 sm:pr-24 bg-white/80 backdrop-blur-lg border-2 border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all duration-300 text-sm sm:text-lg placeholder-gray-400 hover:border-gray-300"
@@ -128,7 +128,7 @@ function ExploreVideos() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2">
             <div className="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-6 text-center border border-white/20">
               <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{mockVideos.length}+</div>
-              <div className="text-gray-600 font-medium text-xs sm:text-sm">Video chất lượng</div>
+              <div className="text-gray-600 font-medium text-xs sm:text-sm">Bài học chất lượng</div>
             </div>
             <div className="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-6 text-center border border-white/20">
               <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-2">1000+</div>
@@ -149,7 +149,7 @@ function ExploreVideos() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
             <div className="flex items-center justify-center sm:justify-start">
               <span className="text-gray-600 font-medium text-xs sm:text-sm md:text-base">
-                Tìm thấy <span className="text-blue-600 font-bold">{filteredVideos.length}</span> video
+                Tìm thấy <span className="text-blue-600 font-bold">{filteredVideos.length}</span> bài học
               </span>
             </div>
             
@@ -391,7 +391,7 @@ function ExploreVideos() {
             {filteredVideos.length === 0 && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🎬</div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Không tìm thấy video phù hợp</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Không tìm thấy bài học phù hợp</h3>
                 <p className="text-gray-600 mb-6">Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm khác</p>
                 <button 
                   onClick={() => {
@@ -419,7 +419,7 @@ function ExploreVideos() {
                     <option>12</option>
                     <option>15</option>
                   </select>
-                  <span>trong tổng số <span className="font-bold text-blue-600">{filteredVideos.length}</span> video</span>
+                  <span>trong tổng số <span className="font-bold text-blue-600">{filteredVideos.length}</span> bài học</span>
                 </div>
                 
                 {/* Pagination Controls */}
@@ -449,7 +449,7 @@ function ExploreVideos() {
 
                 {/* Mobile-friendly page info */}
                 <div className="md:hidden text-center text-sm text-gray-600">
-                  Trang 1 của 5 • <span className="font-bold text-blue-600">{filteredVideos.length}</span> video
+                  Trang 1 của 5 • <span className="font-bold text-blue-600">{filteredVideos.length}</span> bài học
                 </div>
               </div>
             )}
