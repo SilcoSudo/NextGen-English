@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import VideoPlayer from './VideoPlayer';
+import EditLesson from './EditLesson';
 
 const LessonManagement = ({ courses, onLessonUpdated, onLessonDeleted }) => {
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const [editingLesson, setEditingLesson] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -20,9 +22,15 @@ const LessonManagement = ({ courses, onLessonUpdated, onLessonDeleted }) => {
   const handleStatusUpdate = async (courseId, newStatus) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`http://localhost:5000/api/courses/${courseId}/status`, {
+      if (!token) {
+        setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        setLoading(false);
+        return;
+      }
+      
+      const response = await fetch(`http://localhost:5000/api/lessons/${courseId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -50,9 +58,15 @@ const LessonManagement = ({ courses, onLessonUpdated, onLessonDeleted }) => {
   const handleDelete = async (courseId) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       
-      const response = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
+      if (!token) {
+        setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        setLoading(false);
+        return;
+      }
+      
+      const response = await fetch(`http://localhost:5000/api/lessons/${courseId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -215,6 +229,19 @@ const LessonManagement = ({ courses, onLessonUpdated, onLessonDeleted }) => {
                       👁️ Xem chi tiết
                     </button>
                     
+                    <button
+                      onClick={() => {
+                        console.log('🔧 Editing lesson:', course);
+                        console.log('🎥 Video URL:', course.videoUrl);
+                        console.log('🖼️ Thumbnail URL:', course.thumbnailUrl);
+                        setEditingLesson(course);
+                      }}
+                      disabled={loading}
+                      className="px-4 py-2 text-orange-600 border border-orange-600 rounded-lg hover:bg-orange-50 transition-colors text-sm disabled:opacity-50"
+                    >
+                      ✏️ Chỉnh sửa
+                    </button>
+                    
                     {course.status === 'draft' && (
                       <button
                         onClick={() => handleStatusUpdate(course._id, 'published')}
@@ -356,6 +383,18 @@ const LessonManagement = ({ courses, onLessonUpdated, onLessonDeleted }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Edit Lesson Modal */}
+      {editingLesson && (
+        <EditLesson
+          lesson={editingLesson}
+          onLessonUpdated={(updatedLesson) => {
+            onLessonUpdated(updatedLesson);
+            setEditingLesson(null);
+          }}
+          onCancel={() => setEditingLesson(null)}
+        />
       )}
 
       {/* Delete Confirmation Modal */}

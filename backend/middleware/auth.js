@@ -1,13 +1,17 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/UserMongoDB');
+const User = require('../models/User');
 
 // Middleware xác thực JWT token
 const authenticateToken = async (req, res, next) => {
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    
+    console.log('🔐 Auth header:', authHeader ? 'Present' : 'Missing');
+    console.log('🔐 Token:', token ? `${token.substring(0, 20)}...` : 'Missing');
 
     if (!token) {
+      console.log('❌ No token provided');
       return res.status(401).json({
         error: 'Không có token',
         message: 'Vui lòng đăng nhập để truy cập tài nguyên này'
@@ -20,6 +24,7 @@ const authenticateToken = async (req, res, next) => {
     // Tìm user từ token
     const user = await User.findById(decoded.userId);
     if (!user) {
+      console.log('❌ User not found for token:', decoded.userId);
       return res.status(401).json({
         error: 'Token không hợp lệ',
         message: 'Người dùng không tồn tại'
@@ -27,6 +32,7 @@ const authenticateToken = async (req, res, next) => {
     }
 
     if (!user.isActive) {
+      console.log('❌ User account is inactive:', user.username);
       return res.status(401).json({
         error: 'Tài khoản bị khóa',
         message: 'Tài khoản của bạn đã bị vô hiệu hóa'
@@ -35,6 +41,7 @@ const authenticateToken = async (req, res, next) => {
 
     // Thêm thông tin user vào request (toJSON sẽ tự động loại bỏ password)
     req.user = user.toJSON();
+    console.log('✅ User authenticated:', user.username, 'Role:', user.role);
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {

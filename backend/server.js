@@ -9,8 +9,11 @@ const database = require('./config/database');
 
 // Import routes
 const authRoutes = require('./routes/auth');
-const courseRoutes = require('./routes/courses');
+const lessonRoutes = require('./routes/lessons');
 const uploadRoutes = require('./routes/upload');
+const analyticsRoutes = require('./routes/analytics');
+const paymentRoutes = require('./routes/payment');
+const healthRoutes = require('./routes/health');
 
 const app = express();
 
@@ -35,6 +38,7 @@ const corsOptions = {
     
     const allowedOrigins = [
       process.env.FRONTEND_URL || 'http://localhost:3000',
+      'http://localhost:3000',
       'http://127.0.0.1:3000',
       'http://localhost:3001'
     ];
@@ -66,31 +70,34 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check endpoint with database status
-app.get('/health', async (req, res) => {
-  try {
-    const dbHealth = await database.healthCheck();
-    res.status(200).json({
-      status: 'OK',
-      message: 'NextGen English API đang hoạt động',
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development',
-      database: dbHealth
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'ERROR',
-      message: 'Lỗi kết nối database',
-      timestamp: new Date().toISOString(),
-      error: error.message
-    });
-  }
-});
+
 
 // API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/courses', courseRoutes);
+app.use('/api/lessons', lessonRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/analytics', analyticsRoutes);
+
+// Serve static files from React build (Production)
+if (process.env.NODE_ENV === 'production') {
+  const buildPath = path.join(__dirname, '../frontend/build');
+  app.use(express.static(buildPath));
+  
+  // Handle React Router (return all requests to React app)
+  app.get('*', (req, res) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/')) {
+      return res.status(404).json({
+        error: 'API endpoint không tồn tại',
+        message: `Không tìm thấy ${req.method} ${req.originalUrl}`
+      });
+    }
+    
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+}
+app.use('/api/payment', paymentRoutes);
+app.use('/api', healthRoutes);
 
 // Serve video files
 const path = require('path');
@@ -108,35 +115,126 @@ app.get('/api/videos/:filename', (req, res) => {
     });
   }
   
-  // Lấy thông tin file
-  const stat = fs.statSync(videoPath);
-  const fileSize = stat.size;
-  const range = req.headers.range;
-  
-  if (range) {
-    // Hỗ trợ streaming với range requests
-    const parts = range.replace(/bytes=/, "").split("-");
-    const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-    const chunksize = (end - start) + 1;
-    const file = fs.createReadStream(videoPath, { start, end });
-    const head = {
-      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': chunksize,
-      'Content-Type': 'video/mp4',
+  try {
+    // Lấy thông tin file
+    const stat = fs.statSync(videoPath);
+    const fileSize = stat.size;
+    const range = req.headers.range;
+    
+    // Detect MIME type based on file extension
+    const ext = path.extname(filename).toLowerCase();
+    const mimeTypes = {
+      '.mp4': 'video/mp4',
+      '.avi': 'video/x-msvideo',
+      '.mov': 'video/quicktime',
+      '.webm': 'video/webm',
+      '.ogg': 'video/ogg',
+      '.wmv': 'video/x-ms-wmv',
+      '.3gp': 'video/3gpp'
     };
-    res.writeHead(206, head);
-    file.pipe(res);
-  } else {
-    // Serve toàn bộ file
-    const head = {
-      'Content-Length': fileSize,
-      'Content-Type': 'video/mp4',
-    };
-    res.writeHead(200, head);
-    fs.createReadStream(videoPath).pipe(res);
+    const contentType = mimeTypes[ext] || 'video/mp4';
+    
+    if (range) {
+      // Hỗ trợ streaming với range requests
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      let end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      
+      // Validate range
+      if (start >= fileSize || end >= fileSize) {
+        res.status(416).set({
+          'Content-Range': `bytes */${fileSize}`
+        });
+        return res.end();
+      }
+      
+      // Ensure end is not greater than file size
+      end = Math.min(end, fileSize - 1);
+      const chunksize = (end - start) + 1;
+      
+      const file = fs.createReadStream(videoPath, { start, end });
+      const head = {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        'ETag': `"${stat.mtime.getTime()}-${fileSize}"`,
+        'Last-Modified': stat.mtime.toUTCString()
+      };
+      
+      res.writeHead(206, head);
+      file.pipe(res);
+      
+      file.on('error', (err) => {
+        console.error('Video streaming error:', err);
+        res.end();
+      });
+      
+    } else {
+      // Serve toàn bộ file
+      const head = {
+        'Content-Length': fileSize,
+        'Content-Type': contentType,
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        'ETag': `"${stat.mtime.getTime()}-${fileSize}"`,
+        'Last-Modified': stat.mtime.toUTCString()
+      };
+      res.writeHead(200, head);
+      
+      const stream = fs.createReadStream(videoPath);
+      stream.pipe(res);
+      
+      stream.on('error', (err) => {
+        console.error('Video serving error:', err);
+        res.end();
+      });
+    }
+  } catch (error) {
+    console.error('Video endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi phát video'
+    });
   }
+});
+
+// Serve image files
+app.get('/api/images/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, 'uploads', 'images', filename);
+  
+  // Kiểm tra file có tồn tại không
+  if (!fs.existsSync(imagePath)) {
+    return res.status(404).json({
+      success: false,
+      message: 'Hình ảnh không tồn tại'
+    });
+  }
+  
+  // Lấy extension để set content type
+  const ext = path.extname(filename).toLowerCase();
+  let contentType = 'image/jpeg'; // default
+  
+  switch (ext) {
+    case '.png':
+      contentType = 'image/png';
+      break;
+    case '.jpg':
+    case '.jpeg':
+      contentType = 'image/jpeg';
+      break;
+    case '.webp':
+      contentType = 'image/webp';
+      break;
+  }
+  
+  // Set headers và serve file
+  res.setHeader('Content-Type', contentType);
+  res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache 1 năm
+  
+  fs.createReadStream(imagePath).pipe(res);
 });
 
 // Root endpoint
@@ -161,15 +259,17 @@ app.use('*', (req, res) => {
       'POST /api/auth/register',
       'POST /api/auth/logout',
       'GET /api/auth/me',
-      'GET /api/courses',
-      'POST /api/courses',
-      'GET /api/courses/teacher/my-courses',
-      'PUT /api/courses/:id',
-      'DELETE /api/courses/:id',
+      'GET /api/lessons',
+      'POST /api/lessons',
+      'GET /api/lessons/teacher/my-lessons',
+      'PUT /api/lessons/:id',
+      'DELETE /api/lessons/:id',
       'POST /api/upload/video',
+      'POST /api/upload/image',
       'GET /api/upload/my-videos',
       'DELETE /api/upload/video/:filename',
-      'GET /api/videos/:filename'
+      'GET /api/videos/:filename',
+      'GET /api/images/:filename'
     ]
   });
 });

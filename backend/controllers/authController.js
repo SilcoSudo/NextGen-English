@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
-const User = require('../models/UserMongoDB');
+const User = require('../models/User');
+const { sendVerificationEmail, sendPasswordResetEmail } = require('../services/emailService');
 
 // Tạo JWT token
 const generateToken = (userId) => {
@@ -99,7 +100,17 @@ const register = async (req, res) => {
       role: 'student' // Mặc định là student
     });
 
+    // Generate email verification token
+    const verificationToken = newUser.generateEmailVerificationToken();
+    
     await newUser.save();
+
+    // Gửi email xác thực
+    const emailResult = await sendVerificationEmail(email, verificationToken, name);
+    
+    if (!emailResult.success) {
+      console.warn('Email verification failed to send:', emailResult.error);
+    }
 
     // Tạo token
     const token = generateToken(newUser._id);
@@ -109,9 +120,10 @@ const register = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Đăng ký thành công',
+      message: emailResult.success ? 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.' : 'Đăng ký thành công! Tuy nhiên không thể gửi email xác thực.',
       token,
-      user: safeUser
+      user: safeUser,
+      emailSent: emailResult.success
     });
 
   } catch (error) {
@@ -291,6 +303,203 @@ const updateUserRole = async (req, res) => {
   }
 };
 
+// Xác thực email
+const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token xác thực là bắt buộc'
+      });
+    }
+
+    // Tìm user với token
+    const user = await User.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token xác thực không hợp lệ hoặc đã hết hạn'
+      });
+    }
+
+    // Xác thực email
+    user.emailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpires = null;
+    
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Xác thực email thành công!'
+    });
+
+  } catch (error) {
+    console.error('Email verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi xác thực email'
+    });
+  }
+};
+
+// Gửi lại email xác thực
+const resendVerificationEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email là bắt buộc'
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy tài khoản với email này'
+      });
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email đã được xác thực'
+      });
+    }
+
+    // Generate new token
+    const verificationToken = user.generateEmailVerificationToken();
+    await user.save();
+
+    // Send email
+    const emailResult = await sendVerificationEmail(email, verificationToken, user.name);
+    
+    if (emailResult.success) {
+      res.json({
+        success: true,
+        message: 'Email xác thực đã được gửi lại'
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: 'Không thể gửi email xác thực'
+      });
+    }
+
+  } catch (error) {
+    console.error('Resend verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi gửi lại email xác thực'
+    });
+  }
+};
+
+// Yêu cầu reset password
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email là bắt buộc'
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Không tiết lộ user có tồn tại hay không vì lý do bảo mật
+      return res.json({
+        success: true,
+        message: 'Nếu email tồn tại, bạn sẽ nhận được email đặt lại mật khẩu'
+      });
+    }
+
+    // Generate reset token
+    const resetToken = user.generatePasswordResetToken();
+    await user.save();
+
+    // Send email
+    const emailResult = await sendPasswordResetEmail(email, resetToken, user.name);
+    
+    res.json({
+      success: true,
+      message: 'Nếu email tồn tại, bạn sẽ nhận được email đặt lại mật khẩu',
+      emailSent: emailResult.success
+    });
+
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi xử lý yêu cầu đặt lại mật khẩu'
+    });
+  }
+};
+
+// Reset password với token
+const resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    
+    if (!token || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token và mật khẩu mới là bắt buộc'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu phải có ít nhất 6 ký tự'
+      });
+    }
+
+    // Tìm user với token
+    const user = await User.findOne({
+      passwordResetToken: token,
+      passwordResetExpires: { $gt: new Date() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token đặt lại mật khẩu không hợp lệ hoặc đã hết hạn'
+      });
+    }
+
+    // Update password
+    user.password = password;
+    user.passwordResetToken = null;
+    user.passwordResetExpires = null;
+    
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Đặt lại mật khẩu thành công!'
+    });
+
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi đặt lại mật khẩu'
+    });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -298,5 +507,9 @@ module.exports = {
   logout,
   refreshToken,
   updateProfile,
-  updateUserRole
+  updateUserRole,
+  verifyEmail,
+  resendVerificationEmail,
+  forgotPassword,
+  resetPassword
 };

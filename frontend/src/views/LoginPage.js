@@ -196,9 +196,9 @@ function LoginPage() {
                       Ghi nhớ đăng nhập
                     </label>
                   </div>
-                  <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer hover:underline">
+                  <Link to="/forgot-password" className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer hover:underline">
                     Quên mật khẩu?
-                  </a>
+                  </Link>
                 </div>
 
                 {/* Error Message */}

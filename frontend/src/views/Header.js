@@ -13,7 +13,7 @@ function Header() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/videos?search=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/lessons?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
       setIsMenuOpen(false);
     }
@@ -36,8 +36,8 @@ function Header() {
     };
   }, [isProfileDropdownOpen]);
   
-  // Ẩn header khi ở trang admin
-  if (location.pathname.startsWith('/admin')) {
+  // Ẩn header khi ở trang admin hoặc teacher dashboard  
+  if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/teacher')) {
     return null;
   }
   
@@ -76,8 +76,8 @@ function Header() {
               Trang chủ
             </Link>
             <Link
-              to="/videos"
-              className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname.startsWith("/videos") ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
+              to="/lessons"
+              className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname.startsWith("/lessons") ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
             >
               <span className="hidden lg:inline">Bài học</span>
               <span className="lg:hidden">Bài học</span>
@@ -86,12 +86,13 @@ function Header() {
             {isAuthenticated && (
               <>
                 <Link
-                  to="/my-videos"
-                  className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname === "/my-videos" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
+                  to="/my-lessons"
+                  className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname === "/my-lessons" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
                 >
                   <span className="hidden lg:inline">Bài học đã mua</span>
                   <span className="lg:hidden">Đã mua</span>
                 </Link>
+
                 <Link
                   to="/payment"
                   className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname === "/payment" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
@@ -99,6 +100,17 @@ function Header() {
                   Thanh toán
                 </Link>
               </>
+            )}
+            
+            {/* Menu cho Teacher */}
+            {isAuthenticated && user?.role === 'teacher' && (
+              <Link
+                to="/teacher"
+                className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname === "/teacher" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
+              >
+                <span className="hidden xl:inline">Teacher Dashboard</span>
+                <span className="xl:hidden">Teacher</span>
+              </Link>
             )}
             
             {/* Menu cho Admin */}
@@ -112,8 +124,8 @@ function Header() {
                   <span className="xl:hidden">Admin</span>
                 </Link>
                 <Link
-                  to="/admin/videos"
-                  className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname === "/admin/videos" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
+                  to="/admin/lessons"
+                  className={`font-medium text-xs md:text-sm whitespace-nowrap cursor-pointer transition-colors ${location.pathname === "/admin/lessons" ? "text-blue-500" : "text-gray-600 hover:text-blue-500"}`}
                 >
                   <span className="hidden xl:inline">Quản lý bài học</span>
                   <span className="xl:hidden">QL Bài học</span>
@@ -163,9 +175,12 @@ function Header() {
                     <span className={`text-xs px-2 py-0.5 rounded-full ${
                       user?.role === 'admin' 
                         ? 'bg-red-100 text-red-700' 
+                        : user?.role === 'teacher'
+                        ? 'bg-green-100 text-green-700'
                         : 'bg-blue-100 text-blue-700'
                     }`}>
-                      {user?.role === 'admin' ? 'Admin' : 'User'}
+                      {user?.role === 'admin' ? 'Admin' : 
+                       user?.role === 'teacher' ? 'Teacher' : 'User'}
                     </span>
                   </div>
                   <i className={`ri-arrow-down-s-line text-gray-400 transition-transform duration-200 ${isProfileDropdownOpen ? 'rotate-180' : ''}`}></i>
@@ -239,8 +254,8 @@ function Header() {
                 Trang chủ
               </Link>
               <Link
-                to="/videos"
-                className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname.startsWith("/videos") ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
+                to="/lessons"
+                className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname.startsWith("/lessons") ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
                 onClick={() => setIsMenuOpen(false)}
               >
                 <i className="ri-book-open-line mr-3"></i>
@@ -250,13 +265,14 @@ function Header() {
               {isAuthenticated && (
                 <>
                   <Link
-                    to="/my-videos"
-                    className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname === "/my-videos" ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
+                    to="/my-lessons"
+                    className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname === "/my-lessons" ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <i className="ri-book-mark-line mr-3"></i>
                     Bài học đã mua
                   </Link>
+
                   <Link
                     to="/payment"
                     className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname === "/payment" ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
@@ -278,12 +294,24 @@ function Header() {
                 </>
               )}
 
+              {/* Teacher Menu Items */}
+              {isAuthenticated && user?.role === 'teacher' && (
+                <Link
+                  to="/teacher"
+                  className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname === "/teacher" ? "bg-green-50 text-green-600" : "text-gray-600 hover:bg-gray-50"}`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <i className="ri-graduation-cap-line mr-3"></i>
+                  Teacher Dashboard
+                </Link>
+              )}
+
               {/* Admin Menu Items */}
               {isAuthenticated && user?.role === 'admin' && (
                 <>
                   <Link
-                    to="/admin/videos"
-                    className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname === "/admin/videos" ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
+                    to="/admin/lessons"
+                    className={`px-4 py-3 rounded-lg font-medium text-sm ${location.pathname === "/admin/lessons" ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50"}`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <i className="ri-book-2-line mr-3"></i>
@@ -314,9 +342,12 @@ function Header() {
                       <div className={`text-xs px-2 py-1 rounded-full inline-block ${
                         user?.role === 'admin' 
                           ? 'bg-red-100 text-red-700' 
+                          : user?.role === 'teacher'
+                          ? 'bg-green-100 text-green-700'
                           : 'bg-blue-100 text-blue-700'
                       }`}>
-                        {user?.role === 'admin' ? 'Admin' : 'User'}
+                        {user?.role === 'admin' ? 'Admin' : 
+                         user?.role === 'teacher' ? 'Teacher' : 'User'}
                       </div>
                     </div>
                   </div>

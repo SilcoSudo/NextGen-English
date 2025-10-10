@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import mockCourses from "./mockCourses";
 
 function Payment() {
   const navigate = useNavigate();
@@ -14,10 +13,42 @@ function Payment() {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [lesson, setLesson] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Lấy thông tin khóa học từ URL params hoặc state
-  const courseId = new URLSearchParams(location.search).get('courseId') || 2;
-  const course = mockCourses.find(c => c.id === Number(courseId)) || mockCourses[1];
+  // Lấy thông tin bài học từ URL params hoặc state
+  const lessonId = new URLSearchParams(location.search).get('lessonId');
+  const courseId = new URLSearchParams(location.search).get('courseId'); // Legacy support
+  const actualLessonId = lessonId || courseId; // Use lessonId first, fallback to courseId
+
+  useEffect(() => {
+    const fetchLesson = async () => {
+      if (!actualLessonId) {
+        setError('Không tìm thấy bài học');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/lessons/${actualLessonId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setLesson(data.data.lesson || data.data);
+        } else {
+          setError('Không thể tải thông tin bài học');
+        }
+      } catch (err) {
+        console.error('Fetch lesson error:', err);
+        setError('Lỗi kết nối');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLesson();
+  }, [actualLessonId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -31,15 +62,64 @@ function Payment() {
     e.preventDefault();
     setIsProcessing(true);
     
-    // Mock API call
-    setTimeout(() => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch('http://localhost:5000/api/lessons/enroll', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          lessonId: actualLessonId,
+          paymentInfo: formData
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsProcessing(false);
+        setIsSuccess(true);
+        setTimeout(() => {
+          navigate('/my-lessons');
+        }, 2000);
+      } else {
+        throw new Error(data.message || 'Đăng ký khóa học thất bại');
+      }
+    } catch (err) {
+      console.error('Payment error:', err);
       setIsProcessing(false);
-      setIsSuccess(true);
-      setTimeout(() => {
-        navigate('/my-courses');
-      }, 2000);
-    }, 2000);
+      alert('Có lỗi xảy ra: ' + err.message);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="animate-pulse text-center">
+          <div className="h-8 bg-gray-300 rounded mb-4 w-48 mx-auto"></div>
+          <div className="h-4 bg-gray-300 rounded w-32 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !lesson) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="text-red-600 font-medium text-lg mb-4">{error || 'Không tìm thấy khóa học!'}</div>
+          <button 
+            onClick={() => navigate('/lessons')}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Quay lại danh sách khóa học
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (isSuccess) {
     return (
@@ -79,16 +159,26 @@ function Payment() {
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 md:p-4 mb-4">
               <div className="flex flex-col sm:flex-row sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
                 <img 
-                  src={course.image} 
-                  alt={course.title} 
+                  src={lesson.thumbnail || '/api/images/default-lesson.jpg'} 
+                  alt={lesson.title} 
                   className="w-full sm:w-20 h-32 sm:h-20 rounded-lg object-cover"
+                  onError={(e) => {
+                    e.target.src = '/api/images/default-lesson.jpg';
+                  }}
                 />
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-800 mb-1 text-sm md:text-base">{course.title}</h3>
-                  <p className="text-xs md:text-sm text-gray-600 mb-2 leading-relaxed">{course.description}</p>
+                  <h3 className="font-bold text-gray-800 mb-1 text-sm md:text-base">{lesson.title}</h3>
+                  <p className="text-xs md:text-sm text-gray-600 mb-2 leading-relaxed">{lesson.description}</p>
                   <div className="flex items-center text-xs md:text-sm text-gray-500">
-                    <img src={course.teacherAvatar} className="w-5 h-5 md:w-6 md:h-6 rounded-full mr-2" alt="Teacher" />
-                    <span>{course.teacherName}</span>
+                    <img 
+                      src={lesson.createdBy?.avatar || '/api/images/default-teacher.jpg'} 
+                      className="w-5 h-5 md:w-6 md:h-6 rounded-full mr-2" 
+                      alt="Teacher"
+                      onError={(e) => {
+                        e.target.src = '/api/images/default-teacher.jpg';
+                      }}
+                    />
+                    <span>{lesson.createdBy?.name || 'Giáo viên'}</span>
                   </div>
                 </div>
               </div>
@@ -97,23 +187,24 @@ function Payment() {
             <div className="space-y-3">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-600">Độ tuổi:</span>
-                <span className="font-medium">{course.age}</span>
+                <span className="font-medium">{lesson.ageGroup}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-600">Trình độ:</span>
-                <span className="font-medium">{course.level}</span>
+                <span className="font-medium">{lesson.level}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">Thời gian:</span>
-                <span className="font-medium">{course.weeks} tuần</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                <span className="text-gray-600">Số bài học:</span>
-                <span className="font-medium">{course.lessons} bài</span>
+                <span className="text-gray-600">Thời lượng:</span>
+                <span className="font-medium">{lesson.duration} phút</span>
               </div>
               <div className="flex justify-between items-center py-3 bg-blue-50 rounded-lg px-3">
                 <span className="text-lg font-bold text-gray-800">Tổng cộng:</span>
-                <span className="text-2xl font-bold text-blue-600">{course.price}</span>
+                <span className="text-2xl font-bold text-blue-600">
+                  {lesson.price === 0 ? 
+                    'Miễn phí' : 
+                    `${lesson.price?.toLocaleString() || 0}đ`
+                  }
+                </span>
               </div>
             </div>
           </div>
@@ -252,7 +343,12 @@ function Payment() {
                   <>
                     <i className="ri-lock-line mr-2"></i>
                     <span className="hidden sm:inline">Thanh toán an toàn - </span>
-                    <span>{course.price}</span>
+                    <span>
+                      {lesson.price === 0 ? 
+                        'Đăng ký ngay' : 
+                        `${lesson.price?.toLocaleString() || 0}đ`
+                      }
+                    </span>
                   </>
                 )}
               </button>
@@ -273,7 +369,7 @@ function Payment() {
         {/* Nút quay lại */}
         <div className="text-center mt-6 md:mt-8">
           <button
-            onClick={() => navigate('/courses')}
+            onClick={() => navigate('/lessons')}
             className="inline-flex items-center px-4 md:px-6 py-2 md:py-3 text-gray-600 hover:text-gray-800 transition-colors text-sm md:text-base"
           >
             <i className="ri-arrow-left-line mr-2"></i>

@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const { 
   upload, 
   handleUploadError, 
@@ -183,8 +184,66 @@ const getMyVideos = async (req, res) => {
   }
 };
 
+// @desc    Upload image file  
+// @route   POST /api/upload/image
+// @access  Private (Teacher/Admin)
+const uploadImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'Không có file hình ảnh được upload',
+        error: 'NO_FILE'
+      });
+    }
+
+    const { file } = req;
+    const { originalname, filename, mimetype, size } = file;
+    
+    // Tạo thư mục images nếu chưa có
+    const imagesDir = path.join(__dirname, '../uploads/images');
+    if (!fs.existsSync(imagesDir)) {
+      fs.mkdirSync(imagesDir, { recursive: true });
+    }
+    
+    // Tạo tên file cuối cùng
+    const extension = path.extname(originalname);
+    const finalFilename = `${Date.now()}_${Buffer.from(originalname, 'latin1').toString('utf8').replace(/[^a-zA-Z0-9.]/g, '_')}`;
+    
+    // Di chuyển file từ temp sang thư mục images
+    const finalPath = path.join(imagesDir, finalFilename);
+    fs.renameSync(file.path, finalPath);
+    
+    // Tạo URL để truy cập image
+    const imageUrl = `${req.protocol}://${req.get('host')}/api/images/${finalFilename}`;
+    
+    res.json({
+      success: true,
+      message: 'Upload hình ảnh thành công',
+      data: {
+        filename: finalFilename,
+        originalName: Buffer.from(originalname, 'latin1').toString('utf8'),
+        mimetype,
+        size,
+        url: imageUrl,
+        uploadedAt: new Date().toISOString(),
+        uploadedBy: req.user._id || req.user.id
+      }
+    });
+  } catch (error) {
+    console.error('Upload image error:', error);
+    
+    res.status(500).json({
+      success: false,
+      message: 'Có lỗi xảy ra khi upload hình ảnh',
+      error: 'UPLOAD_ERROR'
+    });
+  }
+};
+
 module.exports = {
   uploadVideo,
+  uploadImage,
   getVideoFileInfo,
   deleteVideo,
   getMyVideos

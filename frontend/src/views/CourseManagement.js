@@ -223,18 +223,12 @@ function CourseManagement() {
                 <p className="text-gray-600 text-sm mb-4">{course.description}</p>
 
                 {/* Course Stats */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex justify-center mb-4">
                   <div className="flex items-center">
                     <div className="w-6 h-6 flex items-center justify-center bg-blue-100 rounded-full mr-2">
                       <i className="ri-time-line text-primary"></i>
                     </div>
-                    <span className="text-sm text-gray-600">{course.weeks} tuần học</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-6 h-6 flex items-center justify-center bg-green-100 rounded-full mr-2">
-                      <i className="ri-book-open-line text-green-600"></i>
-                    </div>
-                    <span className="text-sm text-gray-600">{course.lessons} bài học</span>
+                    <span className="text-sm text-gray-600">{course.duration || course.estimatedDuration || 60} phút</span>
                   </div>
                 </div>
 

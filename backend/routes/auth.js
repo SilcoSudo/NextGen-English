@@ -108,6 +108,34 @@ router.put('/profile', [authenticateToken, ...updateProfileValidation], authCont
  */
 router.put('/update-role', authController.updateUserRole);
 
+/**
+ * @route   POST /api/auth/verify-email
+ * @desc    Xác thực email với token
+ * @access  Public
+ */
+router.post('/verify-email', authController.verifyEmail);
+
+/**
+ * @route   POST /api/auth/resend-verification
+ * @desc    Gửi lại email xác thực
+ * @access  Public
+ */
+router.post('/resend-verification', authController.resendVerificationEmail);
+
+/**
+ * @route   POST /api/auth/forgot-password
+ * @desc    Yêu cầu đặt lại mật khẩu
+ * @access  Public
+ */
+router.post('/forgot-password', authController.forgotPassword);
+
+/**
+ * @route   POST /api/auth/reset-password
+ * @desc    Đặt lại mật khẩu với token
+ * @access  Public
+ */
+router.post('/reset-password', authController.resetPassword);
+
 // Test route để kiểm tra API
 router.get('/test', (req, res) => {
   res.json({

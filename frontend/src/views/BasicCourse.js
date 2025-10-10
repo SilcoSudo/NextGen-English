@@ -33,14 +33,10 @@ function BasicCourse() {
         </div>
         <h3 className="text-xl font-bold text-gray-800 mb-2">{course.title}</h3>
         <p className="text-gray-600 text-sm mb-4">{course.description}</p>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex justify-center mb-4">
           <div className="flex items-center">
-            <span className="text-gray-500 text-sm mr-1">🗓️</span>
-            <span className="text-sm text-gray-600">{course.weeks} tuần học</span>
-          </div>
-          <div className="flex items-center">
-            <span className="text-green-500 text-sm mr-1">📚</span>
-            <span className="text-sm text-gray-600">{course.lessons} bài học</span>
+            <span className="text-blue-500 text-sm mr-1">⏱️</span>
+            <span className="text-sm text-gray-600">{course.duration || course.estimatedDuration || 60} phút</span>
           </div>
         </div>
         <div className="flex items-center mb-4">

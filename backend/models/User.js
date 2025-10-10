@@ -1,150 +1,327 @@
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// Mock database - trong thực tế sẽ là MongoDB/PostgreSQL
-let users = [
-  {
-    id: 1,
-    name: 'Administrator',
-    username: 'admin',
-    email: 'admin@nextgen.com',
-    // Password: admin123 (đã được hash)
-    password: '$2a$10$92IXUNpkjO0rOQ6MX2JZyOejYEUdQXJCCJ6IMN8m3gFQO8Pk/YE2m',
-    role: 'admin',
-    avatar: 'https://readdy.ai/api/search-image?query=professional%20admin%20avatar%20cartoon%20style%20business%20person%20with%20tie%2C%20friendly%20smile%2C%20digital%20art&width=60&height=60&seq=admin&orientation=squarish',
-    createdAt: new Date('2025-01-01'),
-    isActive: true
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Họ tên không được để trống'],
+    trim: true,
+    minlength: [2, 'Họ tên phải có ít nhất 2 ký tự'],
+    maxlength: [50, 'Họ tên không được quá 50 ký tự']
   },
-  {
-    id: 2,
-    name: 'Emma Student',
-    username: 'emma',
-    email: 'emma@student.com',
-    // Password: student123 (đã được hash)
-    password: '$2a$10$HIbQaJ0eLKF1.Rj.z6DcxOKcL8x3fYnD3D6aLWpCK5gNFRF/JRweu',
-    role: 'student',
-    avatar: 'https://readdy.ai/api/search-image?query=cute%20cartoon%20avatar%20of%20a%20young%20student%20with%20headphones%2C%20simple%20background%2C%20friendly%20smile%2C%20digital%20art%20style&width=60&height=60&seq=student&orientation=squarish',
-    createdAt: new Date('2025-01-15'),
-    isActive: true
-  }
-];
-
-class User {
-  // Tìm user theo email hoặc username
-  static async findByEmailOrUsername(identifier) {
-    try {
-      const user = users.find(u => 
-        u.email.toLowerCase() === identifier.toLowerCase() || 
-        u.username.toLowerCase() === identifier.toLowerCase()
-      );
-      return user || null;
-    } catch (error) {
-      throw new Error('Lỗi khi tìm kiếm người dùng');
+  username: {
+    type: String,
+    required: [true, 'Tên đăng nhập không được để trống'],
+    unique: true,
+    trim: true,
+    lowercase: true,
+    minlength: [3, 'Tên đăng nhập phải có ít nhất 3 ký tự'],
+    maxlength: [20, 'Tên đăng nhập không được quá 20 ký tự'],
+    match: [/^[a-zA-Z0-9_]+$/, 'Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới']
+  },
+  email: {
+    type: String,
+    required: [true, 'Email không được để trống'],
+    unique: true,
+    trim: true,
+    lowercase: true,
+    match: [
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      'Email không đúng định dạng'
+    ]
+  },
+  password: {
+    type: String,
+    required: [true, 'Mật khẩu không được để trống'],
+    minlength: [6, 'Mật khẩu phải có ít nhất 6 ký tự']
+  },
+  role: {
+    type: String,
+    enum: {
+      values: ['student', 'teacher', 'admin'],
+      message: 'Role phải là student, teacher hoặc admin'
+    },
+    default: 'student'
+  },
+  avatar: {
+    type: String,
+    default: function() {
+      return `https://readdy.ai/api/search-image?query=cute%20cartoon%20avatar%20student%20headphones%20friendly%20smile%20digital%20art&width=60&height=60&seq=user${Date.now()}&orientation=squarish`;
+    }
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: {
+    type: String,
+    default: null
+  },
+  emailVerificationExpires: {
+    type: Date,
+    default: null
+  },
+  passwordResetToken: {
+    type: String,
+    default: null
+  },
+  passwordResetExpires: {
+    type: Date,
+    default: null
+  },
+  lastLogin: {
+    type: Date,
+    default: null
+  },
+  loginCount: {
+    type: Number,
+    default: 0
+  },
+  // Profile information
+  profile: {
+    age: {
+      type: Number,
+      min: [3, 'Tuổi phải từ 3 trở lên'],
+      max: [100, 'Tuổi không được quá 100']
+    },
+    level: {
+      type: String,
+      enum: ['beginner', 'elementary', 'intermediate', 'advanced'],
+      default: 'beginner'
+    },
+    interests: [{
+      type: String,
+      trim: true
+    }],
+    timezone: {
+      type: String,
+      default: 'Asia/Ho_Chi_Minh'
+    },
+    language: {
+      type: String,
+      default: 'vi'
+    }
+  },
+  // Learning statistics
+  stats: {
+    totalLessonsCompleted: {
+      type: Number,
+      default: 0
+    },
+    completedLessons: {
+      type: Number,
+      default: 0
+    },
+    totalTimeSpent: {
+      type: Number, // in minutes
+      default: 0
+    },
+    currentStreak: {
+      type: Number,
+      default: 0
+    },
+    longestStreak: {
+      type: Number,
+      default: 0
+    },
+    lastLessonDate: {
+      type: Date,
+      default: null
+    },
+    lastActiveDate: {
+      type: Date,
+      default: null
+    }
+  },
+  // Subscription info
+  subscription: {
+    type: {
+      type: String,
+      enum: ['free', 'premium', 'vip'],
+      default: 'free'
+    },
+    startDate: {
+      type: Date,
+      default: Date.now
+    },
+    endDate: {
+      type: Date,
+      default: null
+    },
+    isActive: {
+      type: Boolean,
+      default: true
     }
   }
-
-  // Tìm user theo ID
-  static async findById(id) {
-    try {
-      const user = users.find(u => u.id === parseInt(id));
-      return user || null;
-    } catch (error) {
-      throw new Error('Lỗi khi tìm kiếm người dùng theo ID');
+}, {
+  timestamps: true, // Tự động tạo createdAt và updatedAt
+  toJSON: { 
+    virtuals: true,
+    transform: function(doc, ret) {
+      delete ret.password;
+      return ret;
     }
-  }
+  },
+  toObject: { virtuals: true }
+});
 
-  // Tạo user mới
-  static async create(userData) {
-    try {
-      // Kiểm tra email đã tồn tại
-      const existingUser = await this.findByEmailOrUsername(userData.email);
-      if (existingUser) {
-        throw new Error('Email đã được sử dụng');
+// Indexes for better performance
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ username: 1 }, { unique: true });
+userSchema.index({ role: 1 });
+userSchema.index({ isActive: 1 });
+userSchema.index({ 'subscription.type': 1 });
+
+// Virtual for full name
+userSchema.virtual('fullName').get(function() {
+  return this.name;
+});
+
+// Virtual for subscription status
+userSchema.virtual('isSubscriptionActive').get(function() {
+  if (this.subscription.type === 'free') return true;
+  if (!this.subscription.endDate) return this.subscription.isActive;
+  return this.subscription.isActive && new Date() < this.subscription.endDate;
+});
+
+// Pre-save middleware to hash password
+userSchema.pre('save', async function(next) {
+  // Only hash the password if it has been modified (or is new)
+  if (!this.isModified('password')) return next();
+
+  try {
+    // Hash password with cost of 12
+    const saltRounds = 12;
+    this.password = await bcrypt.hash(this.password, saltRounds);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Pre-save middleware to update login stats
+userSchema.pre('save', function(next) {
+  if (this.isModified('lastLogin')) {
+    this.loginCount += 1;
+  }
+  next();
+});
+
+// Instance method to check password
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw new Error('Lỗi khi xác thực mật khẩu');
+  }
+};
+
+// Instance method to update login info
+userSchema.methods.updateLoginInfo = function() {
+  this.lastLogin = new Date();
+  this.loginCount += 1;
+  return this.save();
+};
+
+// Static method to find by email or username
+userSchema.statics.findByEmailOrUsername = function(identifier) {
+  return this.findOne({
+    $or: [
+      { email: identifier.toLowerCase() },
+      { username: identifier.toLowerCase() }
+    ]
+  });
+};
+
+// Static method to get active users count
+userSchema.statics.getActiveUsersCount = function() {
+  return this.countDocuments({ isActive: true });
+};
+
+// Static method to get users by role
+userSchema.statics.getUsersByRole = function(role) {
+  return this.find({ role, isActive: true }).select('-password');
+};
+
+// Instance method to check if premium user
+userSchema.methods.isPremium = function() {
+  return ['premium', 'vip'].includes(this.subscription.type) && this.isSubscriptionActive;
+};
+
+// Instance method to update learning stats
+userSchema.methods.updateLearningStats = function(lessonDuration) {
+  this.stats.totalLessonsCompleted += 1;
+  this.stats.totalTimeSpent += lessonDuration || 0;
+  
+  // Update streak
+  const today = new Date();
+  const lastLessonDate = this.stats.lastLessonDate;
+  
+  if (lastLessonDate) {
+    const diffTime = Math.abs(today - lastLessonDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) {
+      // Consecutive day
+      this.stats.currentStreak += 1;
+      if (this.stats.currentStreak > this.stats.longestStreak) {
+        this.stats.longestStreak = this.stats.currentStreak;
       }
-
-      // Kiểm tra username đã tồn tại
-      const existingUsername = await this.findByEmailOrUsername(userData.username);
-      if (existingUsername) {
-        throw new Error('Tên đăng nhập đã được sử dụng');
-      }
-
-      // Hash password
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-
-      // Tạo user mới
-      const newUser = {
-        id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
-        name: userData.name || userData.username || 'User',
-        username: userData.username,
-        email: userData.email,
-        password: hashedPassword,
-        role: userData.role || 'student',
-        avatar: userData.avatar || `https://readdy.ai/api/search-image?query=cute%20cartoon%20avatar%20of%20a%20young%20student%20with%20headphones%2C%20simple%20background%2C%20friendly%20smile%2C%20digital%20art%20style&width=60&height=60&seq=user${Date.now()}&orientation=squarish`,
-        createdAt: new Date(),
-        isActive: true
-      };
-
-      users.push(newUser);
-      return newUser;
-    } catch (error) {
-      throw error;
+    } else if (diffDays > 1) {
+      // Streak broken
+      this.stats.currentStreak = 1;
     }
+  } else {
+    // First lesson
+    this.stats.currentStreak = 1;
+    this.stats.longestStreak = 1;
   }
+  
+  this.stats.lastLessonDate = today;
+  return this.save();
+};
 
-  // Xác thực mật khẩu
-  static async validatePassword(plainPassword, hashedPassword) {
-    try {
-      return await bcrypt.compare(plainPassword, hashedPassword);
-    } catch (error) {
-      throw new Error('Lỗi khi xác thực mật khẩu');
-    }
-  }
+// Generate email verification token
+userSchema.methods.generateEmailVerificationToken = function() {
+  const crypto = require('crypto');
+  const token = crypto.randomBytes(32).toString('hex');
+  
+  this.emailVerificationToken = token;
+  this.emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  
+  return token;
+};
 
-  // Cập nhật thông tin user
-  static async updateById(id, updateData) {
-    try {
-      const userIndex = users.findIndex(u => u.id === parseInt(id));
-      if (userIndex === -1) {
-        throw new Error('Không tìm thấy người dùng');
-      }
+// Generate password reset token
+userSchema.methods.generatePasswordResetToken = function() {
+  const crypto = require('crypto');
+  const token = crypto.randomBytes(32).toString('hex');
+  
+  this.passwordResetToken = token;
+  this.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  
+  return token;
+};
 
-      // Cập nhật thông tin (không cho cập nhật password qua method này)
-      const allowedUpdates = ['name', 'avatar', 'isActive'];
-      Object.keys(updateData).forEach(key => {
-        if (allowedUpdates.includes(key)) {
-          users[userIndex][key] = updateData[key];
-        }
-      });
+// Verify email verification token
+userSchema.methods.verifyEmailToken = function(token) {
+  return this.emailVerificationToken === token && 
+         this.emailVerificationExpires && 
+         this.emailVerificationExpires > new Date();
+};
 
-      return users[userIndex];
-    } catch (error) {
-      throw error;
-    }
-  }
+// Verify password reset token
+userSchema.methods.verifyPasswordResetToken = function(token) {
+  return this.passwordResetToken === token && 
+         this.passwordResetExpires && 
+         this.passwordResetExpires > new Date();
+};
 
-  // Lấy tất cả users (admin only)
-  static async findAll() {
-    try {
-      return users.map(user => {
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-      });
-    } catch (error) {
-      throw new Error('Lỗi khi lấy danh sách người dùng');
-    }
-  }
-
-  // Đếm số lượng users
-  static async count() {
-    return users.length;
-  }
-
-  // Tạo safe user object (không có password)
-  static toSafeObject(user) {
-    if (!user) return null;
-    const { password, ...safeUser } = user;
-    return safeUser;
-  }
-}
+// Create model
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;

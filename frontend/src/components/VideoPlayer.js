@@ -145,9 +145,13 @@ const VideoPlayer = ({ videoUrl, title, className = '' }) => {
           preload="metadata"
           onLoadedData={handleVideoLoad}
           onError={handleVideoError}
+          crossOrigin="anonymous"
         >
           <source src={videoInfo.embedUrl} type="video/mp4" />
           <source src={videoInfo.embedUrl} type="video/webm" />
+          <source src={videoInfo.embedUrl} type="video/ogg" />
+          <source src={videoInfo.embedUrl} type="video/quicktime" />
+          <source src={videoInfo.embedUrl} type="video/x-msvideo" />
           <source src={videoInfo.embedUrl} type="video/ogg" />
           Trình duyệt của bạn không hỗ trợ phát video HTML5.
         </video>

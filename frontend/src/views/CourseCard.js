@@ -3,17 +3,101 @@ import { useNavigate } from "react-router-dom";
 
 function CourseCard({ course }) {
   const navigate = useNavigate();
+  
+  // Debug validation
+  if (!course || typeof course !== 'object') {
+    console.error('❌ CourseCard: Invalid course object:', course);
+    return <div>Invalid course data</div>;
+  }
+  
+  // Transform database objects to display values
+  const safeCourse = {
+    ...course,
+    title: typeof course.title === 'string' ? course.title : 'Untitled Course',
+    description: typeof course.description === 'string' ? course.description : 'No description',
+    level: typeof course.level === 'string' ? course.level : 'Unknown',
+    age: typeof course.age === 'string' ? course.age : course.ageGroup || '',
+    
+    // Transform pricing object to price string
+    price: (() => {
+      if (typeof course.price === 'string') return course.price;
+      if (course.pricing && typeof course.pricing === 'object') {
+        if (course.pricing.type === 'free' || course.pricing.price === 0) {
+          return 'Free';
+        }
+        const price = course.pricing.discountPrice || course.pricing.price;
+        return price ? `${price.toLocaleString('vi-VN')}đ` : 'Free';
+      }
+      return 'Free';
+    })(),
+    
+    // Handle skills array
+    skills: Array.isArray(course.skills) ? course.skills : [],
+    
+    // Transform instructor object to teacher info
+    teacherName: (() => {
+      if (typeof course.teacherName === 'string') return course.teacherName;
+      if (course.instructor && typeof course.instructor === 'object') {
+        return course.instructor.name || 'Unknown Teacher';
+      }
+      return 'Unknown Teacher';
+    })(),
+    
+    teacherRole: (() => {
+      if (typeof course.teacherRole === 'string') return course.teacherRole;
+      if (course.instructor && typeof course.instructor === 'object') {
+        return course.instructor.role || 'Teacher';
+      }
+      return 'Teacher';
+    })(),
+    
+    teacherAvatar: (() => {
+      if (course.instructor && typeof course.instructor === 'object' && course.instructor.avatar) {
+        return course.instructor.avatar;
+      }
+      if (typeof course.teacherAvatar === 'string') return course.teacherAvatar;
+      if (course.instructor && typeof course.instructor === 'object') {
+        return course.instructor.avatar || null;
+      }
+      return null;
+    })(),
+    
+    // Transform stats object to numbers
+    students: (() => {
+      if (typeof course.students === 'number') return course.students;
+      if (course.stats && typeof course.stats === 'object') {
+        return course.stats.totalEnrollments || course.stats.enrolledStudents || 0;
+      }
+      return 0;
+    })(),
+    
+    rating: (() => {
+      if (typeof course.rating === 'number') return course.rating;
+      if (course.stats && typeof course.stats === 'object') {
+        return course.stats.averageRating || 0;
+      }
+      return 0;
+    })(),
+    
+    // Additional properties
+    lessons: course.totalLessons || (Array.isArray(course.lessons) ? course.lessons.length : 0),
+    duration: course.stats?.totalDuration || course.duration || 0,
+    reviews: course.stats?.totalReviews || 0
+  };
+  
+  course = safeCourse;
 
   const handleClick = (e) => {
+    const courseId = course._id || course.id;
     // Card 1: Bắt đầu học
-    if (course.id === 1 && e.target.name === "start") {
+    if (courseId === 1 && e.target.name === "start") {
       e.stopPropagation();
-      navigate(`/courses/${course.id}/learn`);
+      navigate(`/lessons/${courseId}/learn`);
     }
     // Các card khác: Đăng ký học
     else if (e.target.name === "register") {
       e.stopPropagation();
-      navigate(`/payment?courseId=${course.id}`);
+      navigate(`/payment?courseId=${courseId}`);
     }
   };
 
@@ -25,7 +109,7 @@ function CourseCard({ course }) {
       <div className="relative">
         <div className="relative overflow-hidden rounded-t-2xl">
           <img 
-            src={course.image} 
+            src={course.thumbnail || course.image || 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=250&fit=crop&auto=format&q=80'} 
             alt={course.title} 
             className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110" 
           />
@@ -39,7 +123,7 @@ function CourseCard({ course }) {
           )}
           
           {/* Rating badge */}
-          {course.rating > 0 && (
+          {course.rating && typeof course.rating === 'number' && course.rating > 0 && (
             <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-lg px-3 py-1 rounded-full flex items-center space-x-1 shadow-lg">
               <span className="text-yellow-500">⭐</span>
               <span className="text-sm font-bold text-gray-800">{course.rating}</span>
@@ -54,11 +138,13 @@ function CourseCard({ course }) {
             <div className={`px-3 py-1 rounded-full text-xs font-bold ${course.levelColor || 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'} shadow-sm`}>
               {course.level}
             </div>
-            <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium">
-              👶 {course.age}
-            </div>
+            {course.age && (
+              <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full font-medium">
+                👶 {course.age}
+              </div>
+            )}
           </div>
-          {course.students > 0 && (
+          {course.students && typeof course.students === 'number' && course.students > 0 && (
             <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
               {course.students} học viên
             </div>
@@ -73,38 +159,31 @@ function CourseCard({ course }) {
         <p className="text-gray-600 text-sm mb-6 line-clamp-2">{course.description}</p>
 
         {/* Course Info với icon hiện đại */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="flex justify-center mb-6">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-sm">
               <span className="text-white text-sm">⏱️</span>
             </div>
             <div>
               <div className="text-xs text-gray-500">Thời lượng</div>
-              <div className="text-sm font-semibold text-gray-800">{course.weeks} tuần</div>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 flex items-center justify-center bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-sm">
-              <span className="text-white text-sm">📚</span>
-            </div>
-            <div>
-              <div className="text-xs text-gray-500">Bài học</div>
-              <div className="text-sm font-semibold text-gray-800">{course.lessons} bài</div>
+              <div className="text-sm font-semibold text-gray-800">{course.duration} phút</div>
             </div>
           </div>
         </div>
 
         {/* Skills tags */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {course.skills.map((skill, index) => (
-            <span 
-              key={index}
-              className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full text-xs font-medium border border-purple-200"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
+        {course.skills && Array.isArray(course.skills) && course.skills.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {course.skills.map((skill, index) => (
+              <span 
+                key={index}
+                className="px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full text-xs font-medium border border-purple-200"
+              >
+                {typeof skill === 'string' ? skill : String(skill)}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Teacher Info */}
         <div className="flex items-center mb-6">

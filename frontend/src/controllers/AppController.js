@@ -4,19 +4,24 @@ import React from "react";
 import { Routes, Route, Navigate, HashRouter } from "react-router-dom";
 import StudentDashboard from "../views/StudentDashboard";
 import Header from "../views/Header";
-import ExploreVideos from "../views/ExploreVideos";
-import CourseLearn from "../views/CourseLearn";
+import ExploreLessons from "../views/ExploreLessons";
+import MyLessons from "../views/MyLessons";
+
+import LessonWatch from "../views/LessonWatch";
 import Home from "../views/Home";
-import MyVideos from "../views/MyVideos";
+
 import Payment from "../views/Payment";
 import LoginPage from "../views/LoginPage";
 import RegisterPage from "../views/RegisterPage";
+import ForgotPassword from "../views/ForgotPassword";
+import VerifyEmail from "../views/VerifyEmail";
+import ResetPassword from "../views/ResetPassword";
 import ProtectedRoute from "../views/ProtectedRoute";
 import AdminRoute from "../views/admin/AdminRoute";
 import AdminHome from "../views/admin/AdminHome";
 import AdminRedirect from "../views/admin/AdminRedirect";
 import TeacherRoute from "../views/teacher/TeacherRoute";
-import TeacherDashboard from "../views/TeacherDashboard";
+import TeacherDashboard from "../views/teacher/TeacherDashboard";
 import UserManagement from "../views/UserManagement";
 import CourseManagement from "../views/CourseManagement";
 import RevenueChart from "../views/RevenueChart";
@@ -40,6 +45,9 @@ function App() {
           } />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Protected Routes - Yêu cầu đăng nhập */}
           <Route path="/dashboard" element={
@@ -50,33 +58,33 @@ function App() {
               </>
             </ProtectedRoute>
           } />
-          {/* Legacy course routes - redirect to videos */}
-          <Route path="/courses" element={<Navigate to="/videos" replace />} />
-          <Route path="/my-courses" element={<Navigate to="/my-videos" replace />} />
-          
-          {/* New video routes */}
-          <Route path="/videos" element={
+          {/* Lesson routes */}
+          <Route path="/lessons" element={
             <>
               <Header />
-              <ExploreVideos />
+              <ExploreLessons />
             </>
           } />
-          <Route path="/my-videos" element={
+          <Route path="/courses" element={<Navigate to="/lessons" replace />} />
+          <Route path="/my-lessons" element={
             <ProtectedRoute>
               <>
                 <Header />
-                <MyVideos />
+                <MyLessons />
               </>
             </ProtectedRoute>
           } />
-          <Route path="/courses/:id/learn" element={
+          <Route path="/my-courses" element={<Navigate to="/my-lessons" replace />} />
+          <Route path="/lessons/:id/watch" element={
             <ProtectedRoute>
               <>
                 <Header />
-                <CourseLearn />
+                <LessonWatch />
               </>
             </ProtectedRoute>
           } />
+          <Route path="/courses/:id/learn" element={<Navigate to="/lessons/:id/watch" replace />} />
+          <Route path="/lessons/:id/learn" element={<Navigate to="/lessons/:id/watch" replace />} />
           <Route path="/payment" element={
             <ProtectedRoute>
               <>
@@ -96,6 +104,8 @@ function App() {
           {/* Teacher Preview (Demo UI/UX) */}
           <Route path="/teacher-preview" element={<TeacherPreview />} />
           
+
+          
           {/* Admin Routes */}
           <Route path="/admin" element={
             <AdminRoute>
@@ -103,9 +113,10 @@ function App() {
             </AdminRoute>
           } />
           {/* Legacy admin course route - redirect */}
-          <Route path="/admin/courses" element={<Navigate to="/admin/videos" replace />} />
+          <Route path="/admin/courses" element={<Navigate to="/admin/lessons" replace />} />
+          <Route path="/admin/videos" element={<Navigate to="/admin/lessons" replace />} />
           
-          <Route path="/admin/videos" element={
+          <Route path="/admin/lessons" element={
             <AdminRoute>
               <CourseManagement />
             </AdminRoute>

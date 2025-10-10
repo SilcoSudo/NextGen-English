@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   uploadVideo,
+  uploadImage,
   getVideoFileInfo,
   deleteVideo,
   getMyVideos
@@ -9,6 +10,7 @@ const {
 const { authenticateToken } = require('../middleware/auth');
 const teacherAuth = require('../middleware/teacherAuth');
 const { upload, handleUploadError } = require('../middleware/uploadVideo');
+const { uploadImage: uploadImg, handleImageUploadError } = require('../middleware/uploadImage');
 
 // @route   POST /api/upload/video
 // @desc    Upload video file
@@ -19,6 +21,17 @@ router.post('/video',
   upload.single('video'),
   handleUploadError,
   uploadVideo
+);
+
+// @route   POST /api/upload/image
+// @desc    Upload image file
+// @access  Private (Teacher/Admin)
+router.post('/image', 
+  authenticateToken, 
+  teacherAuth,
+  uploadImg.single('image'),
+  handleImageUploadError,
+  uploadImage
 );
 
 // @route   GET /api/upload/my-videos

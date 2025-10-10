@@ -15,7 +15,13 @@ const VideoLibrary = ({ onVideoSelect, isModal = false, onClose }) => {
   const fetchVideos = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        setLoading(false);
+        return;
+      }
       
       const response = await fetch('http://localhost:5000/api/upload/my-videos', {
         headers: {
@@ -40,7 +46,12 @@ const VideoLibrary = ({ onVideoSelect, isModal = false, onClose }) => {
 
   const handleDeleteVideo = async (filename) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
+      
+      if (!token) {
+        setError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        return;
+      }
       
       const response = await fetch(`http://localhost:5000/api/upload/video/${filename}`, {
         method: 'DELETE',

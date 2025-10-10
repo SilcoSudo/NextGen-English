@@ -7,7 +7,7 @@ function Home() {
   const handleLearnNowClick = () => {
     if (isAuthenticated) {
       // Đã đăng nhập - chuyển đến tab bài học
-      window.location.hash = "#/videos";
+      window.location.hash = "#/lessons";
     } else {
       // Chưa đăng nhập - chuyển đến trang đăng nhập
       window.location.hash = "#/login";
@@ -75,7 +75,7 @@ function Home() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start max-w-2xl mx-auto lg:mx-0">
-                <a href="#/videos" className="group w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-blue-900 py-4 px-8 rounded-2xl text-base md:text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-yellow-500/25 hover:scale-105 min-h-[56px] touch-manipulation inline-flex items-center justify-center">
+                <a href="#/lessons" className="group w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-blue-900 py-4 px-8 rounded-2xl text-base md:text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-yellow-500/25 hover:scale-105 min-h-[56px] touch-manipulation inline-flex items-center justify-center">
                   <span className="flex items-center justify-center space-x-2">
                     <span>🚀</span>
                     <span>Khám phá bài học</span>
@@ -91,13 +91,6 @@ function Home() {
                     <span>{isAuthenticated ? "Học ngay" : "Đăng nhập để học"}</span>
                   </span>
                 </button>
-                <a href="#/teacher-preview" className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 px-8 rounded-2xl text-base md:text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-green-500/25 hover:scale-105 min-h-[56px] touch-manipulation inline-flex items-center justify-center">
-                  <span className="flex items-center justify-center space-x-2">
-                    <span>🎓</span>
-                    <span>Teacher UI/UX</span>
-                    <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
-                  </span>
-                </a>
               </div>
             </div>
             
@@ -131,31 +124,7 @@ function Home() {
         </div>
       </section>
 
-      {/* Teacher Preview Banner */}
-      <section className="py-8 bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-green-400/30 to-emerald-500/30 animate-pulse"></div>
-        </div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium border border-white/30 mb-4">
-              <span className="w-2 h-2 bg-yellow-300 rounded-full mr-2 animate-pulse"></span>
-              🆕 TÍNH NĂNG MỚI
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold mb-3">
-              🎓 Khám phá giao diện Teacher Dashboard
-            </h2>
-            <p className="text-green-100 mb-4 max-w-2xl mx-auto">
-              Trải nghiệm đầy đủ tính năng tạo bài học, quản lý video, và upload content cho giảng viên!
-            </p>
-            <a href="#/teacher-preview" className="inline-flex items-center space-x-2 bg-white text-green-600 hover:bg-gray-100 px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-lg">
-              <span>🚀</span>
-              <span>Xem Demo Teacher UI/UX</span>
-              <i className="ri-arrow-right-line"></i>
-            </a>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Features */}
       <section className="py-16 md:py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
@@ -206,27 +175,6 @@ function Home() {
               </div>
             </div>
 
-            {/* Feature 2
-            <div className="group relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500"></div>
-              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 text-center transition-all duration-500 hover:scale-105 hover:shadow-2xl border border-white/20">
-                <div className="relative mb-6">
-                  <div className="w-20 h-20 bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center mx-auto transform transition-transform group-hover:rotate-12 group-hover:scale-110">
-                    <i className="ri-team-line text-3xl text-white"></i>
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <span className="text-xs">👨‍🏫</span>
-                  </div>
-                </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-4 text-gray-800">Giáo viên chuyên nghiệp</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Đội ngũ giáo viên bản ngữ và Việt Nam giàu kinh nghiệm, được đào tạo chuyên sâu về tâm lý và phương pháp giảng dạy trẻ em.
-                </p>
-                <div className="mt-6 text-pink-500 font-semibold">
-                  100% giáo viên chứng chỉ →
-                </div>
-              </div>
-            </div> */}
 
             {/* Feature 3 */}
             <div className="group relative md:col-span-2 lg:col-span-1">
@@ -242,7 +190,7 @@ function Home() {
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold mb-4 text-gray-800">Học qua trò chơi</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Gamification với hệ thống thưởng, level up và achievement giúp trẻ luôn hứng thú và động lực trong quá trình học tập.
+                  Gamification với hệ thống thưởng và level up giúp trẻ luôn hứng thú và động lực trong quá trình học tập.
                 </p>
                 <div className="mt-6 text-green-500 font-semibold">
                   500+ mini games tương tác →
@@ -485,8 +433,8 @@ function Home() {
               Hàng nghìn phụ huynh và học sinh đã tin tưởng lựa chọn NextGen English
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-            {/* Testimonial 1 */}
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+            {/* Testimonial 1 
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
               <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-white/20">
@@ -529,7 +477,7 @@ function Home() {
               </div>
             </div>
 
-            {/* Testimonial 2 */}
+            {/* Testimonial 2 
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
               <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-white/20">
@@ -572,7 +520,7 @@ function Home() {
               </div>
             </div>
 
-            {/* Testimonial 3 */}
+            {/* Testimonial 3 
             <div className="group relative md:col-span-2 lg:col-span-1">
               <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-3xl blur-xl opacity-0 group-hover:opacity-10 transition-opacity duration-500"></div>
               <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 border border-white/20">
@@ -614,7 +562,7 @@ function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Stats Section */}
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
@@ -633,106 +581,6 @@ function Home() {
             <div className="group">
               <div className="text-4xl font-bold text-orange-600 mb-2 group-hover:scale-110 transition-transform">24/7</div>
               <div className="text-gray-600 text-sm">Hỗ trợ tận tình</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Free Trial */}
-      <section className="py-20 md:py-28 bg-gradient-to-br from-indigo-600 via-purple-700 to-pink-600 text-white relative overflow-hidden">
-        {/* Background Animation */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-0 w-full h-full opacity-20">
-            <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-pink-400/30 to-orange-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-indigo-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-          </div>
-        </div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center">
-            <div className="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-semibold mb-8 border border-white/20">
-              <span className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
-              Chỉ còn 48 giờ để nhận ưu đãi đặc biệt!
-            </div>
-            
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              <span className="block">Bắt đầu hành trình</span>
-              <span className="bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 bg-clip-text text-transparent">
-                học tiếng Anh ngay hôm nay!
-              </span>
-            </h2>
-            
-            <p className="text-lg md:text-xl lg:text-2xl mb-12 max-w-4xl mx-auto leading-relaxed opacity-90">
-              Đăng ký học thử <span className="font-bold text-yellow-300">MIỄN PHÍ</span> và trải nghiệm phương pháp học tiếng Anh 
-              <span className="font-bold text-cyan-300"> hiệu quả nhất</span> tại NextGen English.
-            </p>
-
-            {/* Benefits */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
-              <div className="flex items-center justify-center md:justify-start space-x-3 text-left">
-                <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center">
-                  <i className="ri-check-line text-xl text-white"></i>
-                </div>
-                <div>
-                  <div className="font-bold text-lg">Học thử 7 ngày</div>
-                  <div className="text-white/80 text-sm">Hoàn toàn miễn phí</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center md:justify-start space-x-3 text-left">
-                <div className="w-12 h-12 bg-blue-500 rounded-2xl flex items-center justify-center">
-                  <i className="ri-user-star-line text-xl text-white"></i>
-                </div>
-                <div>
-                  <div className="font-bold text-lg">Giáo viên 1:1</div>
-                  <div className="text-white/80 text-sm">Hỗ trợ cá nhân hóa</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-center md:justify-start space-x-3 text-left">
-                <div className="w-12 h-12 bg-purple-500 rounded-2xl flex items-center justify-center">
-                  <i className="ri-gift-line text-xl text-white"></i>
-                </div>
-                <div>
-                  <div className="font-bold text-lg">Tặng kèm</div>
-                  <div className="text-white/80 text-sm">Tài liệu học tập</div>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 items-center justify-center max-w-lg mx-auto">
-              <button className="group w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-blue-900 py-4 px-8 rounded-2xl text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-yellow-500/25 hover:scale-105 min-h-[60px] touch-manipulation">
-                <span className="flex items-center justify-center space-x-2">
-                  <span>🎉</span>
-                  <span>Đăng ký học thử MIỄN PHÍ</span>
-                  <i className="ri-arrow-right-line group-hover:translate-x-1 transition-transform"></i>
-                </span>
-              </button>
-              
-              <button className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border-2 border-white/30 hover:border-white/50 py-4 px-8 rounded-2xl text-lg font-bold transition-all duration-300 hover:scale-105 min-h-[60px] touch-manipulation">
-                <span className="flex items-center justify-center space-x-2">
-                  <i className="ri-phone-line"></i>
-                  <span>Tư vấn miễn phí</span>
-                </span>
-              </button>
-            </div>
-
-            {/* Trust Indicators */}
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-8 opacity-70">
-              <div className="flex items-center space-x-2">
-                <i className="ri-shield-check-line text-green-400"></i>
-                <span className="text-sm">Không ràng buộc</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <i className="ri-time-line text-blue-400"></i>
-                <span className="text-sm">Hỗ trợ 24/7</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <i className="ri-medal-line text-yellow-400"></i>
-                <span className="text-sm">Cam kết chất lượng</span>
-              </div>
             </div>
           </div>
         </div>

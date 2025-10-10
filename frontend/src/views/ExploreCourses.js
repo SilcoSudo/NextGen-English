@@ -1,12 +1,13 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import CourseCard from "./CourseCard";
-import mockCourses from "./mockCourses";
 
-const ageOptions = ["4-7 tuổi", "8-10 tuổi"];
+const ageOptions = ["6-8 tuổi", "8-10 tuổi"];
 const levelOptions = ["Cơ bản", "Trung cấp", "Nâng cao"];
 const skillOptions = ["Nói", "Nghe", "Đọc", "Viết"];
 
 function ExploreCourses() {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedAges, setSelectedAges] = useState([]);
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -14,39 +15,182 @@ function ExploreCourses() {
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState("grid");
 
+  // Transform database course object to safe display format
+  const transformCourse = (course) => {
+    if (!course || typeof course !== 'object') {
+      return null;
+    }
+
+    return {
+      _id: course._id,
+      id: course.id || course._id,
+      title: String(course.title || 'Untitled Course'),
+      description: String(course.description || 'No description'),
+      level: String(course.level || 'Beginner'),
+      age: String(course.ageGroup || course.age || 'all'),
+      ageGroup: String(course.ageGroup || 'all'),
+      category: String(course.category || 'general'),
+      
+      // Safe thumbnail handling
+      thumbnail: course.thumbnail || course.image || 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=250&fit=crop&auto=format&q=80',
+      
+      // Transform skills from lessons if available
+      skills: (() => {
+        if (Array.isArray(course.skills)) return course.skills;
+        if (Array.isArray(course.lessons)) {
+          const allSkills = [];
+          course.lessons.forEach(lesson => {
+            if (Array.isArray(lesson.skills)) {
+              allSkills.push(...lesson.skills);
+            }
+          });
+          return [...new Set(allSkills)]; // Remove duplicates
+        }
+        return [];
+      })(),
+      
+      // Transform price/pricing object
+      price: (() => {
+        if (course.pricing && typeof course.pricing === 'object') {
+          if (course.pricing.type === 'free' || course.pricing.price === 0) {
+            return 'Free';
+          }
+          const price = course.pricing.discountPrice || course.pricing.price;
+          return price ? `${price.toLocaleString('vi-VN')}đ` : 'Free';
+        }
+        if (typeof course.price === 'number') {
+          return course.price === 0 ? 'Free' : `${course.price.toLocaleString('vi-VN')}đ`;
+        }
+        return 'Free';
+      })(),
+      
+      // Safe numeric properties from stats or direct properties
+      weeks: typeof course.weeks === 'number' ? course.weeks : 0,
+      lessons: course.totalLessons || (Array.isArray(course.lessons) ? course.lessons.length : 0),
+      students: course.stats?.totalEnrollments || course.students || 0,
+      rating: course.stats?.averageRating || course.rating || 0,
+      
+      // Teacher info from instructor object
+      teacherName: (() => {
+        if (course.instructor && typeof course.instructor === 'object') {
+          return String(course.instructor.name || 'Unknown Teacher');
+        }
+        if (typeof course.teacherName === 'string') return course.teacherName;
+        return 'Unknown Teacher';
+      })(),
+      
+      teacherAvatar: (() => {
+        if (course.instructor && typeof course.instructor === 'object') {
+          return course.instructor.avatar || '/avatar/default-teacher.jpg';
+        }
+        if (typeof course.teacherAvatar === 'string') return course.teacherAvatar;
+        return '/avatar/default-teacher.jpg';
+      })(),
+      
+      teacherRole: (() => {
+        if (course.instructor && typeof course.instructor === 'object') {
+          return String(course.instructor.role || 'Teacher');
+        }
+        if (typeof course.teacherRole === 'string') return course.teacherRole;
+        return 'Teacher';
+      })(),
+
+      // Additional properties from API
+      totalReviews: course.stats?.totalReviews || 0,
+      completionRate: course.completionRate || 0,
+      duration: course.stats?.totalDuration || 0,
+      isPremium: course.pricing?.type === 'premium' || false,
+      isPublished: course.settings?.isPublished || true
+    };
+  };
+
+  // Load courses from API
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        console.log('🔄 Fetching courses from API...');
+        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/lessons`);
+        
+        console.log('📡 API Response status:', response.status);
+        console.log('📡 API Response headers:', response.headers);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📚 Raw courses API response:', data);
+          console.log('📊 Raw courses count:', data.data?.length || 0);
+          
+          let rawCourses = data.data || data.courses || [];
+          if (!Array.isArray(rawCourses)) {
+            console.warn('⚠️ Expected array but got:', typeof rawCourses);
+            rawCourses = [];
+          }
+          
+          // Transform each course to safe format
+          const transformedCourses = rawCourses
+            .map((course, index) => {
+              console.log(`🔧 Transforming course ${index + 1}:`, course.title);
+              return transformCourse(course);
+            })
+            .filter(course => course !== null);
+          
+          console.log('✅ Transformed courses:', transformedCourses);
+          console.log('📊 Final courses count:', transformedCourses.length);
+          setCourses(transformedCourses);
+        } else {
+          console.error('❌ Failed to fetch courses:', response.status, response.statusText);
+          const errorText = await response.text();
+          console.error('❌ Error response:', errorText);
+          setCourses([]);
+        }
+      } catch (error) {
+        console.error('💥 Fetch error:', error);
+        setCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
+
   // Lọc và tìm kiếm khóa học
   const filteredCourses = useMemo(() => {
-    let courses = mockCourses.filter(course => {
+    console.log('🔍 Filtering courses:', courses);
+    if (!Array.isArray(courses)) {
+      console.warn('⚠️ Courses is not an array:', courses);
+      return [];
+    }
+    
+    let coursesData = courses.filter(course => {
       // Tìm kiếm theo tên
-      if (searchQuery && !course.title.toLowerCase().includes(searchQuery.toLowerCase()) 
-          && !course.description.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (searchQuery && !course.title?.toLowerCase().includes(searchQuery.toLowerCase()) 
+          && !course.description?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       // Lọc theo độ tuổi
       if (selectedAges.length > 0 && !selectedAges.includes(course.age)) return false;
       // Lọc theo trình độ
       if (selectedLevels.length > 0 && !selectedLevels.includes(course.level)) return false;
       // Lọc theo kỹ năng
-      if (selectedSkills.length > 0 && !selectedSkills.some(skill => course.skills.includes(skill))) return false;
+      if (selectedSkills.length > 0 && !selectedSkills.some(skill => course.skills?.includes(skill))) return false;
       return true;
     });
 
     // Sắp xếp
-    courses.sort((a, b) => {
+    coursesData.sort((a, b) => {
       switch (sortBy) {
         case 'popular':
-          return b.students - a.students;
+          return (b.students || 0) - (a.students || 0);
         case 'price-low':
-          return parseInt(a.price.replace(/[^\d]/g, '')) - parseInt(b.price.replace(/[^\d]/g, ''));
+          return (parseInt(a.price?.replace(/[^\d]/g, '') || '0')) - (parseInt(b.price?.replace(/[^\d]/g, '') || '0'));
         case 'price-high':
-          return parseInt(b.price.replace(/[^\d]/g, '')) - parseInt(a.price.replace(/[^\d]/g, ''));
+          return (parseInt(b.price?.replace(/[^\d]/g, '') || '0')) - (parseInt(a.price?.replace(/[^\d]/g, '') || '0'));
         case 'rating':
-          return b.rating - a.rating;
+          return (b.rating || 0) - (a.rating || 0);
         default:
-          return b.id - a.id; // newest
+          return (b.id || 0) - (a.id || 0); // newest
       }
     });
 
-    return courses;
-  }, [selectedAges, selectedLevels, selectedSkills, searchQuery, sortBy]);
+    return coursesData;
+  }, [courses, selectedAges, selectedLevels, selectedSkills, searchQuery, sortBy]);
 
   // Xử lý tick filter
   const handleFilterChange = (type, value) => {
@@ -58,6 +202,17 @@ function ExploreCourses() {
       setSelectedSkills(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value]);
     }
   };
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Đang tải bài học...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -116,7 +271,7 @@ function ExploreCourses() {
           {/* Stats Row */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2">
             <div className="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-6 text-center border border-white/20">
-              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{mockCourses.length}+</div>
+              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{courses.length}+</div>
               <div className="text-gray-600 font-medium text-xs sm:text-sm">Khóa học chất lượng</div>
             </div>
             <div className="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-6 text-center border border-white/20">
@@ -338,8 +493,8 @@ function ExploreCourses() {
                     <div className="flex items-center justify-between">
                       <span>{range.label}</span>
                       <span className="text-xs text-gray-400 group-hover:text-orange-400">
-                        {mockCourses.filter(c => {
-                          const price = parseInt(c.price.replace(/[^\d]/g, ''));
+                        {courses.filter(c => {
+                          const price = parseInt(c.price?.replace(/[^\d]/g, '') || '0');
                           return range.max === 0 ? price === 0 : price >= range.min && price <= range.max;
                         }).length} khóa học
                       </span>
@@ -362,9 +517,15 @@ function ExploreCourses() {
         {/* Course list */}
         <div className="lg:col-span-9 px-2 lg:px-0">
           <div className={`grid gap-3 sm:gap-4 md:gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-            {filteredCourses.map((course) => (
-              <CourseCard key={course.id} course={course} />
-            ))}
+            {Array.isArray(filteredCourses) && filteredCourses.map((course) => {
+              if (!course || typeof course !== 'object') {
+                console.error('❌ Invalid course object:', course);
+                return null;
+              }
+              return (
+                <CourseCard key={course._id || course.id || Math.random()} course={course} />
+              );
+            }).filter(Boolean)}
           </div>
           {/* Modern Pagination */}
           <div className="flex flex-col items-center justify-center mt-8 md:mt-12 space-y-6">

@@ -1,19 +1,47 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../models/AuthContext";
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalLessons: 0,
+    totalRevenue: 0,
+    totalEnrollments: 0,
+    publishedLessons: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Mock data cho admin dashboard
-  const stats = {
-    totalUsers: 1250,
-    totalCourses: 45,
-    totalRevenue: 12500000,
-    activeUsers: 890,
-    newUsersThisMonth: 156,
-    coursesCompleted: 2340
+  useEffect(() => {
+    fetchAdminStats();
+  }, []);
+
+  const fetchAdminStats = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch('http://localhost:5000/api/analytics/admin', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setStats(data.data.overview);
+        }
+      } else {
+        setError('Không thể tải thống kê');
+      }
+    } catch (err) {
+      console.error('Admin stats error:', err);
+      setError('Lỗi kết nối');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,31 +72,43 @@ function AdminDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Tổng người dùng</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.totalUsers.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {loading ? '...' : stats.totalUsers.toLocaleString()}
+                </p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <i className="ri-user-line text-blue-600 text-xl"></i>
               </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-              <span className="text-green-600 font-medium">+12%</span>
-              <span className="text-gray-500 ml-2">so với tháng trước</span>
+              {error ? (
+                <span className="text-red-600 font-medium">{error}</span>
+              ) : (
+                <>
+                  <span className="text-blue-600 font-medium">Active</span>
+                  <span className="text-gray-500 ml-2">người dùng đang hoạt động</span>
+                </>
+              )}
             </div>
           </div>
 
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Tổng khóa học</p>
-                <p className="text-2xl font-bold text-gray-800">{stats.totalCourses}</p>
+                <p className="text-sm font-medium text-gray-600">Tổng bài học</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {loading ? '...' : stats.totalLessons}
+                </p>
               </div>
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <i className="ri-book-line text-green-600 text-xl"></i>
               </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-              <span className="text-green-600 font-medium">+3</span>
-              <span className="text-gray-500 ml-2">khóa học mới</span>
+              <span className="text-green-600 font-medium">
+                {loading ? '...' : stats.publishedLessons}
+              </span>
+              <span className="text-gray-500 ml-2">bài học đã xuất bản</span>
             </div>
           </div>
 
@@ -76,15 +116,19 @@ function AdminDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Doanh thu</p>
-                <p className="text-2xl font-bold text-gray-800">{(stats.totalRevenue / 1000000).toFixed(1)}M VNĐ</p>
+                <p className="text-2xl font-bold text-gray-800">
+                  {loading ? '...' : `${(stats.totalRevenue / 1000000).toFixed(1)}M VNĐ`}
+                </p>
               </div>
               <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <i className="ri-money-dollar-circle-line text-yellow-600 text-xl"></i>
               </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-              <span className="text-green-600 font-medium">+8%</span>
-              <span className="text-gray-500 ml-2">so với tháng trước</span>
+              <span className="text-yellow-600 font-medium">
+                {loading ? '...' : `${stats.totalEnrollments}`}
+              </span>
+              <span className="text-gray-500 ml-2">lượt mua bài học</span>
             </div>
           </div>
 

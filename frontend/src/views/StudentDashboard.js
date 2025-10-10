@@ -96,44 +96,7 @@ function StudentDashboard() {
             <span>4 days left</span>
           </div>
         </div>
-        {/* Achievements */}
-        <div className="bg-white rounded-lg p-6 card-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-800">Achievements</h2>
-            <div className="w-8 h-8 flex items-center justify-center bg-green-100 rounded-full">
-              <i className="ri-medal-line text-green-600"></i>
-            </div>
-          </div>
-          <div className="grid grid-cols-4 gap-3 mb-4">
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-1">
-                <i className="ri-book-read-fill text-yellow-500 text-xl"></i>
-              </div>
-              <span className="text-xs text-gray-600">Reader</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-1">
-                <i className="ri-mic-fill text-blue-500 text-xl"></i>
-              </div>
-              <span className="text-xs text-gray-600">Speaker</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1">
-                <i className="ri-headphone-fill text-gray-400 text-xl"></i>
-              </div>
-              <span className="text-xs text-gray-400">Listener</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1">
-                <i className="ri-pen-nib-fill text-gray-400 text-xl"></i>
-              </div>
-              <span className="text-xs text-gray-400">Writer</span>
-            </div>
-          </div>
-          <button className="w-full py-2 border border-gray-200 text-gray-700 rounded-button text-sm font-medium whitespace-nowrap !rounded-button">
-            View All Badges
-          </button>
-        </div>
+
       </div>
       {/* Continue Learning */}
       <div className="mb-8">

@@ -1,87 +1,32 @@
 const mongoose = require('mongoose');
 
-// Sub-schema for lesson progress
+// User Progress cho từng bài học
 const lessonProgressSchema = new mongoose.Schema({
-  lessonId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true
-  },
-  status: {
-    type: String,
-    enum: ['not-started', 'in-progress', 'completed', 'skipped'],
-    default: 'not-started'
-  },
-  completedAt: {
-    type: Date,
-    default: null
-  },
-  timeSpent: {
-    type: Number, // in seconds
-    default: 0
-  },
-  attempts: {
-    type: Number,
-    default: 0
-  },
-  score: {
-    type: Number,
-    min: 0,
-    max: 100,
-    default: null
-  },
-  // Track which content pieces were completed
-  completedContent: [{
-    contentId: mongoose.Schema.Types.ObjectId,
-    completedAt: Date,
-    timeSpent: Number
-  }],
-  // Quiz results
-  quizResults: [{
-    attemptNumber: Number,
-    score: Number,
-    answers: [{
-      questionId: String,
-      userAnswer: mongoose.Schema.Types.Mixed,
-      isCorrect: Boolean,
-      timeSpent: Number
-    }],
-    completedAt: Date,
-    passed: Boolean
-  }],
-  notes: {
-    type: String,
-    maxlength: 1000
-  }
-}, { 
-  timestamps: true,
-  _id: false 
-});
-
-// Main Progress Schema
-const progressSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  courseId: {
+  lessonId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
+    ref: 'Lesson',
     required: true
   },
   
-  // Overall course progress
+  // Progress status (simplified for individual lesson purchase)
   status: {
     type: String,
-    enum: ['not-started', 'in-progress', 'completed', 'paused'],
+    enum: ['not-started', 'in-progress', 'completed'],
     default: 'not-started'
   },
+  
+  // Timestamps
   enrolledAt: {
     type: Date,
     default: Date.now
   },
   startedAt: {
-    type: Date,
+    type: Date, 
     default: null
   },
   completedAt: {
@@ -93,52 +38,44 @@ const progressSchema = new mongoose.Schema({
     default: Date.now
   },
   
-  // Progress statistics
-  stats: {
-    totalLessons: {
-      type: Number,
-      default: 0
-    },
-    completedLessons: {
-      type: Number,
-      default: 0
-    },
-    completionPercentage: {
-      type: Number,
-      default: 0,
-      min: 0,
-      max: 100
-    },
-    totalTimeSpent: {
-      type: Number, // in minutes
-      default: 0
-    },
-    averageScore: {
-      type: Number,
-      default: null,
-      min: 0,
-      max: 100
-    },
-    streak: {
-      current: {
-        type: Number,
-        default: 0
-      },
-      longest: {
-        type: Number,
-        default: 0
-      },
-      lastStudyDate: {
-        type: Date,
-        default: null
-      }
-    }
+  // Progress details
+  watchTime: {
+    type: Number, // in seconds
+    default: 0
+  },
+  totalTime: {
+    type: Number, // lesson duration in seconds
+    default: 0
+  },
+  progressPercentage: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 100
   },
   
-  // Detailed lesson progress
-  lessons: [lessonProgressSchema],
+  // Quiz/Assessment results
+  quizAttempts: [{
+    attemptNumber: Number,
+    score: Number,
+    answers: [{
+      questionId: String,
+      userAnswer: mongoose.Schema.Types.Mixed,
+      isCorrect: Boolean,
+      timeSpent: Number
+    }],
+    completedAt: Date,
+    passed: Boolean
+  }],
   
-  // Course rating and feedback
+  bestScore: {
+    type: Number,
+    default: null,
+    min: 0,
+    max: 100
+  },
+  
+  // User feedback
   rating: {
     score: {
       type: Number,
@@ -156,55 +93,67 @@ const progressSchema = new mongoose.Schema({
     }
   },
   
-  // Learning preferences and settings
-  preferences: {
-    studyReminders: {
-      enabled: {
-        type: Boolean,
-        default: true
-      },
-      time: {
-        type: String,
-        default: '20:00'
-      },
-      days: [{
-        type: String,
-        enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-      }]
-    },
-    autoplay: {
-      type: Boolean,
-      default: true
-    },
-    playbackSpeed: {
-      type: Number,
-      default: 1.0,
-      min: 0.5,
-      max: 2.0
-    }
+  // Notes and bookmarks
+  notes: {
+    type: String,
+    maxlength: 1000
   },
-  
-  // Certificates
-  certificates: [{
-    type: {
-      type: String,
-      enum: ['completion', 'achievement', 'mastery']
-    },
-    issuedAt: Date,
-    certificateId: String,
-    downloadUrl: String
-  }],
-  
-  // Bookmarks and favorites
   bookmarks: [{
-    lessonId: mongoose.Schema.Types.ObjectId,
-    contentId: mongoose.Schema.Types.ObjectId,
+    timestamp: Number, // position in video (seconds)
     note: String,
     createdAt: {
       type: Date,
       default: Date.now
     }
-  }]
+  }],
+  
+  // Payment info (required for individual lesson purchase)
+  paymentInfo: {
+    paid: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    amount: {
+      type: Number,
+      required: true,
+      default: 0
+    },
+    paymentMethod: {
+      type: String,
+      enum: ['free', 'card', 'bank', 'wallet', 'paypal'],
+      required: true,
+      default: 'free'
+    },
+    transactionId: {
+      type: String,
+      default: null
+    },
+    currency: {
+      type: String,
+      default: 'VND'
+    },
+    paidAt: {
+      type: Date,
+      default: null
+    }
+  },
+  
+  // Access info
+  access: {
+    hasLifetimeAccess: {
+      type: Boolean,
+      default: true // Once purchased, lifetime access
+    },
+    expiresAt: {
+      type: Date,
+      default: null // null = lifetime
+    },
+    downloadAllowed: {
+      type: Boolean,
+      default: false
+    }
+  }
 
 }, {
   timestamps: true,
@@ -212,197 +161,229 @@ const progressSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-// Compound indexes for better performance
-progressSchema.index({ userId: 1, courseId: 1 }, { unique: true });
-progressSchema.index({ userId: 1, status: 1 });
-progressSchema.index({ courseId: 1, status: 1 });
-progressSchema.index({ lastAccessedAt: -1 });
-progressSchema.index({ 'stats.completionPercentage': -1 });
+// Compound indexes
+lessonProgressSchema.index({ userId: 1, lessonId: 1 }, { unique: true });
+lessonProgressSchema.index({ userId: 1, status: 1 });
+lessonProgressSchema.index({ lessonId: 1, status: 1 });
+lessonProgressSchema.index({ lastAccessedAt: -1 });
+lessonProgressSchema.index({ completedAt: -1 });
 
-// Virtual for current lesson
-progressSchema.virtual('currentLesson').get(function() {
-  const inProgressLesson = this.lessons.find(lesson => lesson.status === 'in-progress');
-  if (inProgressLesson) return inProgressLesson;
+// Virtual for completion status
+lessonProgressSchema.virtual('isCompleted').get(function() {
+  return this.status === 'completed';
+});
+
+// Virtual for watch percentage
+lessonProgressSchema.virtual('watchPercentage').get(function() {
+  if (this.totalTime === 0) return 0;
+  return Math.round((this.watchTime / this.totalTime) * 100);
+});
+
+// Pre-save middleware
+lessonProgressSchema.pre('save', function(next) {
+  // Update timestamps based on status changes
+  if (this.isModified('status')) {
+    if (this.status === 'in-progress' && !this.startedAt) {
+      this.startedAt = new Date();
+    } else if (this.status === 'completed' && !this.completedAt) {
+      this.completedAt = new Date();
+      this.progressPercentage = 100;
+    }
+  }
   
-  const nextLesson = this.lessons.find(lesson => lesson.status === 'not-started');
-  return nextLesson || null;
-});
-
-// Virtual for next lesson
-progressSchema.virtual('nextLesson').get(function() {
-  return this.lessons.find(lesson => lesson.status === 'not-started') || null;
-});
-
-// Pre-save middleware to calculate completion percentage
-progressSchema.pre('save', function(next) {
-  if (this.isModified('lessons') || this.isNew) {
-    const completedLessons = this.lessons.filter(lesson => lesson.status === 'completed').length;
-    const totalLessons = this.lessons.length;
-    
-    this.stats.completedLessons = completedLessons;
-    this.stats.totalLessons = totalLessons;
-    this.stats.completionPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-    
-    // Calculate average score
-    const completedLessonsWithScore = this.lessons.filter(lesson => 
-      lesson.status === 'completed' && lesson.score !== null
-    );
-    
-    if (completedLessonsWithScore.length > 0) {
-      const totalScore = completedLessonsWithScore.reduce((sum, lesson) => sum + lesson.score, 0);
-      this.stats.averageScore = Math.round(totalScore / completedLessonsWithScore.length);
-    }
-    
-    // Calculate total time spent
-    this.stats.totalTimeSpent = Math.round(
-      this.lessons.reduce((total, lesson) => total + (lesson.timeSpent || 0), 0) / 60
-    );
-    
-    // Update course status
-    if (this.stats.completionPercentage === 100) {
-      this.status = 'completed';
-      if (!this.completedAt) {
-        this.completedAt = new Date();
-      }
-    } else if (this.stats.completionPercentage > 0) {
-      this.status = 'in-progress';
-      if (!this.startedAt) {
-        this.startedAt = new Date();
-      }
-    }
+  // Auto-set payment info for free lessons
+  if (this.isNew && !this.paymentInfo.paid) {
+    // This will be handled by controller when lesson price is known
+  }
+  
+  // Update lastAccessedAt
+  if (this.isModified('watchTime') || this.isModified('status')) {
+    this.lastAccessedAt = new Date();
   }
   
   next();
 });
 
-// Static method to get user progress overview
-progressSchema.statics.getUserProgressOverview = function(userId) {
+// Post-save middleware for basic stats update
+lessonProgressSchema.post('save', async function() {
+  try {
+    const User = require('./User');
+    
+    // Check if lesson was just completed
+    if (this.status === 'completed' && this.isModified('status')) {
+      console.log(`✅ Lesson completed by user ${this.userId}`);
+      
+      // Update user stats
+      const user = await User.findById(this.userId);
+      if (user) {
+        // Update completed lessons count
+        await User.findByIdAndUpdate(this.userId, {
+          $inc: { 'stats.completedLessons': 1 }
+        });
+        
+        // Check streak and update if needed
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        if (user.stats.lastActiveDate) {
+          const lastActive = new Date(user.stats.lastActiveDate);
+          lastActive.setHours(0, 0, 0, 0);
+          
+          if (lastActive.getTime() === yesterday.getTime()) {
+            // Continue streak
+            await User.findByIdAndUpdate(this.userId, {
+              $inc: { 'stats.currentStreak': 1 },
+              $set: { 'stats.lastActiveDate': new Date() },
+              $max: { 'stats.longestStreak': user.stats.currentStreak + 1 }
+            });
+          } else if (lastActive.getTime() !== today.getTime()) {
+            // Reset streak
+            await User.findByIdAndUpdate(this.userId, {
+              $set: { 
+                'stats.currentStreak': 1,
+                'stats.lastActiveDate': new Date()
+              },
+              $max: { 'stats.longestStreak': Math.max(user.stats.longestStreak || 0, 1) }
+            });
+          }
+        } else {
+          // First lesson - start streak
+          await User.findByIdAndUpdate(this.userId, {
+            $set: { 
+              'stats.currentStreak': 1,
+              'stats.longestStreak': 1,
+              'stats.lastActiveDate': new Date()
+            }
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Stats update error in Progress post-save:', error);
+  }
+});
+
+// Static methods
+
+// Get user's lesson progress overview
+lessonProgressSchema.statics.getUserOverview = function(userId) {
   return this.aggregate([
     { $match: { userId: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: '$status',
         count: { $sum: 1 },
-        avgCompletion: { $avg: '$stats.completionPercentage' },
-        totalTimeSpent: { $sum: '$stats.totalTimeSpent' }
+        totalWatchTime: { $sum: '$watchTime' }
       }
     }
   ]);
 };
 
-// Static method to get course progress analytics
-progressSchema.statics.getCourseAnalytics = function(courseId) {
+// Get lesson analytics
+lessonProgressSchema.statics.getLessonAnalytics = function(lessonId) {
   return this.aggregate([
-    { $match: { courseId: new mongoose.Types.ObjectId(courseId) } },
+    { $match: { lessonId: new mongoose.Types.ObjectId(lessonId) } },
     {
       $group: {
         _id: null,
-        totalEnrollments: { $sum: 1 },
+        totalPurchases: { $sum: 1 },
         completedCount: { 
           $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
         },
         inProgressCount: { 
           $sum: { $cond: [{ $eq: ['$status', 'in-progress'] }, 1, 0] }
         },
-        avgCompletionPercentage: { $avg: '$stats.completionPercentage' },
-        avgTimeSpent: { $avg: '$stats.totalTimeSpent' },
+        notStartedCount: { 
+          $sum: { $cond: [{ $eq: ['$status', 'not-started'] }, 1, 0] }
+        },
+        avgWatchTime: { $avg: '$watchTime' },
+        avgProgressPercentage: { $avg: '$progressPercentage' },
         avgRating: { 
           $avg: { 
             $cond: [{ $ne: ['$rating.score', null] }, '$rating.score', null] 
           }
-        }
+        },
+        totalRevenue: { $sum: '$paymentInfo.amount' }
       }
     }
   ]);
 };
 
-// Instance method to start lesson
-progressSchema.methods.startLesson = function(lessonId) {
-  let lessonProgress = this.lessons.find(l => l.lessonId.toString() === lessonId.toString());
+// Instance methods
+
+// Start watching lesson
+lessonProgressSchema.methods.startWatching = function() {
+  if (this.status === 'not-started') {
+    this.status = 'in-progress';
+    this.startedAt = new Date();
+  }
+  this.lastAccessedAt = new Date();
+  return this.save();
+};
+
+// Update watch progress
+lessonProgressSchema.methods.updateProgress = function(watchTime, totalTime) {
+  this.watchTime = Math.max(this.watchTime, watchTime); // Don't allow going backwards
+  this.totalTime = totalTime;
   
-  if (!lessonProgress) {
-    lessonProgress = {
-      lessonId: lessonId,
-      status: 'in-progress',
-      attempts: 1
-    };
-    this.lessons.push(lessonProgress);
-  } else if (lessonProgress.status === 'not-started') {
-    lessonProgress.status = 'in-progress';
-    lessonProgress.attempts += 1;
+  // Calculate progress percentage
+  this.progressPercentage = Math.round((this.watchTime / this.totalTime) * 100);
+  
+  // Auto-complete if watched 90% or more
+  if (this.progressPercentage >= 90 && this.status !== 'completed') {
+    this.status = 'completed';
+    this.completedAt = new Date();
+    this.progressPercentage = 100;
+  } else if (this.status === 'not-started') {
+    this.status = 'in-progress';
+    this.startedAt = new Date();
   }
   
   this.lastAccessedAt = new Date();
   return this.save();
 };
 
-// Instance method to complete lesson
-progressSchema.methods.completeLesson = function(lessonId, score = null, timeSpent = 0) {
-  const lessonProgress = this.lessons.find(l => l.lessonId.toString() === lessonId.toString());
-  
-  if (lessonProgress) {
-    lessonProgress.status = 'completed';
-    lessonProgress.completedAt = new Date();
-    lessonProgress.score = score;
-    lessonProgress.timeSpent += timeSpent;
-    
-    // Update streak
-    this.updateStreak();
-  }
-  
+// Complete lesson viewing manually
+lessonProgressSchema.methods.completeWatching = function() {
+  this.status = 'completed';
+  this.completedAt = new Date();
+  this.progressPercentage = 100;
   this.lastAccessedAt = new Date();
   return this.save();
 };
 
-// Instance method to update streak
-progressSchema.methods.updateStreak = function() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const lastStudyDate = this.stats.streak.lastStudyDate;
-  
-  if (lastStudyDate) {
-    const lastStudy = new Date(lastStudyDate);
-    lastStudy.setHours(0, 0, 0, 0);
-    
-    const diffTime = today.getTime() - lastStudy.getTime();
-    const diffDays = diffTime / (1000 * 3600 * 24);
-    
-    if (diffDays === 1) {
-      // Consecutive day
-      this.stats.streak.current += 1;
-      if (this.stats.streak.current > this.stats.streak.longest) {
-        this.stats.streak.longest = this.stats.streak.current;
-      }
-    } else if (diffDays > 1) {
-      // Streak broken
-      this.stats.streak.current = 1;
-    }
-    // If diffDays === 0, same day - don't change streak
-  } else {
-    // First study day
-    this.stats.streak.current = 1;
-    this.stats.streak.longest = 1;
-  }
-  
-  this.stats.streak.lastStudyDate = new Date();
-};
-
-// Instance method to add bookmark
-progressSchema.methods.addBookmark = function(lessonId, contentId = null, note = '') {
-  const bookmark = {
-    lessonId,
-    contentId,
-    note,
-    createdAt: new Date()
+// Add quiz result
+lessonProgressSchema.methods.addQuizResult = function(score, answers, passed) {
+  const attempt = {
+    attemptNumber: this.quizAttempts.length + 1,
+    score,
+    answers,
+    completedAt: new Date(),
+    passed
   };
   
-  this.bookmarks.push(bookmark);
+  this.quizAttempts.push(attempt);
+  
+  // Update best score
+  if (!this.bestScore || score > this.bestScore) {
+    this.bestScore = score;
+  }
+  
+  // Auto-complete if quiz passed and not already completed
+  if (passed && this.status !== 'completed') {
+    this.status = 'completed';
+    this.completedAt = new Date();
+    this.progressPercentage = 100;
+  }
+  
   return this.save();
 };
 
-// Instance method to rate course
-progressSchema.methods.rateCourse = function(score, review = '') {
+// Rate lesson
+lessonProgressSchema.methods.rateLesson = function(score, review = '') {
   this.rating = {
     score,
     review,
@@ -412,7 +393,33 @@ progressSchema.methods.rateCourse = function(score, review = '') {
   return this.save();
 };
 
-// Create model
-const Progress = mongoose.model('Progress', progressSchema);
+// Add bookmark
+lessonProgressSchema.methods.addBookmark = function(timestamp, note = '') {
+  const bookmark = {
+    timestamp,
+    note,
+    createdAt: new Date()
+  };
+  
+  this.bookmarks.push(bookmark);
+  return this.save();
+};
 
-module.exports = Progress;
+// Process payment
+lessonProgressSchema.methods.processPayment = function(amount, paymentMethod, transactionId = null) {
+  this.paymentInfo = {
+    paid: true,
+    paidAt: new Date(),
+    amount,
+    paymentMethod,
+    transactionId,
+    currency: 'VND'
+  };
+  
+  return this.save();
+};
+
+// Create model
+const LessonProgress = mongoose.model('LessonProgress', lessonProgressSchema);
+
+module.exports = LessonProgress;
