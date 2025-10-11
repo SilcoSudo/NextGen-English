@@ -62,9 +62,22 @@ const getLessons = async (req, res) => {
 
     const result = await Lesson.paginate(query, options);
 
+    // Check if user is authenticated and add isPurchased field
+    let lessonsWithPurchaseStatus = result.docs;
+    if (req.user) {
+      const userProgresses = await LessonProgress.find({ userId: req.user.id }).select('lessonId');
+      const purchasedLessonIds = userProgresses.map(p => p.lessonId.toString());
+      
+      lessonsWithPurchaseStatus = result.docs.map(lesson => {
+        const lessonObj = lesson.toObject();
+        lessonObj.isPurchased = purchasedLessonIds.includes(lesson._id.toString());
+        return lessonObj;
+      });
+    }
+
     res.json({
       success: true,
-      data: result.docs,
+      data: lessonsWithPurchaseStatus,
       pagination: {
         currentPage: result.page,
         totalPages: result.totalPages,

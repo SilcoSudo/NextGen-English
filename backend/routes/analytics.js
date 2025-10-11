@@ -8,12 +8,14 @@ const {
 } = require('../controllers/analyticsController');
 
 // Teacher analytics routes
-router.get('/teacher/:teacherId?', authenticateToken, getTeacherAnalytics);
+router.get('/teacher', authenticateToken, getTeacherAnalytics);
+router.get('/teacher/:teacherId', authenticateToken, getTeacherAnalytics);
 
 // Admin analytics routes (admin only)
 router.get('/admin', authenticateToken, requireAdmin, getAdminAnalytics);
 
 // Student analytics routes
-router.get('/student/:studentId?', authenticateToken, getStudentAnalytics);
+router.get('/student', authenticateToken, getStudentAnalytics);
+router.get('/student/:studentId', authenticateToken, getStudentAnalytics);
 
 module.exports = router;

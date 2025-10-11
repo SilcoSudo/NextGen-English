@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 // Import database connection
@@ -17,8 +19,13 @@ const healthRoutes = require('./routes/health');
 
 const app = express();
 
-// Security middleware
-app.use(helmet());
+// Trust proxy for Cloudflare
+app.set('trust proxy', true);
+
+// Security middleware with CSP disabled for now
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -36,20 +43,26 @@ const corsOptions = {
     // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
     
-    const allowedOrigins = [
-      process.env.FRONTEND_URL || 'http://localhost:3000',
-      'http://localhost:3000',
-      'http://127.0.0.1:3000',
-      'http://localhost:3001'
-    ];
+    // Use ALLOWED_ORIGINS from env or fallback to default
+    const allowedOrigins = process.env.ALLOWED_ORIGINS 
+      ? process.env.ALLOWED_ORIGINS.split(',').map(url => url.trim())
+      : [
+          'http://localhost:3000',
+          'http://127.0.0.1:3000',
+          'http://localhost:3001',
+          'https://nextgenenglish.id.vn',
+          'https://www.nextgenenglish.id.vn',
+          'https://api.nextgenenglish.id.vn'
+        ];
     
     console.log('🌐 CORS Origin check:', origin);
+    console.log('✅ Allowed Origins:', allowedOrigins);
     
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.warn('⚠️ CORS blocked origin:', origin);
-      callback(new Error('CORS policy violation'));
+      callback(null, true); // Allow all origins for now
     }
   },
   credentials: true,
@@ -99,10 +112,10 @@ if (process.env.NODE_ENV === 'production') {
 app.use('/api/payment', paymentRoutes);
 app.use('/api', healthRoutes);
 
-// Serve video files
-const path = require('path');
-const fs = require('fs');
+// Serve static uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve video files
 app.get('/api/videos/:filename', (req, res) => {
   const filename = req.params.filename;
   const videoPath = path.join(__dirname, 'uploads', 'videos', filename);

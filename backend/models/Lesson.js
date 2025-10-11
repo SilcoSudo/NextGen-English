@@ -141,7 +141,7 @@ const lessonSchema = new mongoose.Schema({
       type: Number,
       default: 0
     },
-    totalEnrollments: {
+    totalPurchases: {
       type: Number,
       default: 0
     },
@@ -209,14 +209,14 @@ lessonSchema.index({ 'stats.averageRating': -1 });
 
 // Virtual for completion rate
 lessonSchema.virtual('completionRate').get(function() {
-  if (this.stats.totalEnrollments === 0) return 0;
-  return Math.round((this.stats.totalCompletions / this.stats.totalEnrollments) * 100);
+  if (this.stats.totalPurchases === 0) return 0;
+  return Math.round((this.stats.totalCompletions / this.stats.totalPurchases) * 100);
 });
 
-// Virtual for enrollment conversion rate
-lessonSchema.virtual('enrollmentConversionRate').get(function() {
+// Virtual for purchase conversion rate
+lessonSchema.virtual('purchaseConversionRate').get(function() {
   if (this.stats.totalViews === 0) return 0;
-  return Math.round((this.stats.totalEnrollments / this.stats.totalViews) * 100);
+  return Math.round((this.stats.totalPurchases / this.stats.totalViews) * 100);
 });
 
 // Virtual for formatted price
@@ -224,7 +224,7 @@ lessonSchema.virtual('formattedPrice').get(function() {
   if (this.price === 0) return 'Miễn phí';
   return new Intl.NumberFormat('vi-VN', { 
     style: 'currency', 
-    currency: this.currency 
+    currency: this.currency || 'VND'
   }).format(this.price);
 });
 
@@ -333,9 +333,11 @@ lessonSchema.methods.addView = function() {
   return this.save();
 };
 
-lessonSchema.methods.addEnrollment = function(amount = 0) {
-  this.stats.totalEnrollments += 1;
+lessonSchema.methods.addPurchase = function(amount = 0) {
+  this.stats.totalPurchases += 1;
   this.stats.totalRevenue += amount;
+  this.stats.conversionRate = this.stats.totalViews > 0 ? 
+    Math.round((this.stats.totalPurchases / this.stats.totalViews) * 100) : 0;
   return this.save();
 };
 

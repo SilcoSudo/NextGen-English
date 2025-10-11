@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect } from "react";
 import LessonCard from "./LessonCard";
+import { useAuth } from "../models/AuthContext";
 
 const ageOptions = ["6-8 tuổi", "8-10 tuổi"];
 const levelOptions = ["Cơ bản", "Trung cấp", "Nâng cao"];
 const skillOptions = ["Nói", "Nghe", "Đọc", "Viết"];
 
 function ExploreLessons() {
+  const { user } = useAuth();
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAges, setSelectedAges] = useState([]);
@@ -88,7 +90,19 @@ function ExploreLessons() {
     const fetchLessons = async () => {
       try {
         console.log('🔄 Fetching lessons from API...');
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/lessons`);
+        
+        const headers = {
+          'Content-Type': 'application/json'
+        };
+        
+        // Add auth token if user is logged in
+        if (user && user.token) {
+          headers.Authorization = `Bearer ${user.token}`;
+        }
+        
+        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/lessons`, {
+          headers
+        });
         
         console.log('📡 API Response status:', response.status);
         
@@ -128,7 +142,7 @@ function ExploreLessons() {
       }
     };
     fetchLessons();
-  }, []);
+  }, [user]);
 
   // Lọc và tìm kiếm bài học
   const filteredLessons = useMemo(() => {

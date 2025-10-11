@@ -1,0 +1,9 @@
+tunnel: nextgen-english
+credentials-file: C:\Users\ASUS\.cloudflared\c06f7538-d4df-43d6-936d-26e69897a713.json
+
+ingress:
+  - hostname: nextgenenglish.id.vn
+    service: http://localhost:5000
+  - hostname: api.nextgenenglish.id.vn
+    service: http://localhost:5000
+  - service: http_status:404
