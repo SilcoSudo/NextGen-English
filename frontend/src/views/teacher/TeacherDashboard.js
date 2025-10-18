@@ -61,20 +61,38 @@ const TeacherDashboard = () => {
 
       console.log('📡 Courses response status:', coursesResponse.status);
       
+      // Fetch teacher's analytics
+      const analyticsResponse = await fetch(`${window.location.origin}/api/analytics/teacher`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      console.log('📊 Analytics response status:', analyticsResponse.status);
+      
       if (coursesResponse.ok) {
         const coursesData = await coursesResponse.json();
         setCourses(coursesData.data || []);
         
-        // Calculate statistics
+        // Calculate statistics from courses
         const totalCourses = coursesData.data?.length || 0;
         const publishedCourses = coursesData.data?.filter(c => c.status === 'published').length || 0;
         const draftCourses = coursesData.data?.filter(c => c.status === 'draft').length || 0;
+        
+        // Get student count from analytics
+        let totalStudents = 0;
+        if (analyticsResponse.ok) {
+          const analyticsData = await analyticsResponse.json();
+          if (analyticsData.success) {
+            totalStudents = analyticsData.data.overview.totalStudents || 0;
+          }
+        }
         
         setStats({
           totalCourses,
           publishedCourses,
           draftCourses,
-          totalStudents: 0 // TODO: implement when we have enrollment system
+          totalStudents
         });
       } else {
         const errorData = await coursesResponse.json();

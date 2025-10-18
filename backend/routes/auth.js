@@ -138,6 +138,29 @@ router.post('/forgot-password', authController.forgotPassword);
  */
 router.post('/reset-password', authController.resetPassword);
 
+// ADMIN ROUTES - Quản lý người dùng (chỉ admin)
+
+/**
+ * @route   GET /api/auth/admin/users
+ * @desc    Lấy danh sách tất cả users với phân trang và lọc
+ * @access  Admin only
+ */
+router.get('/admin/users', authenticateToken, requireAdmin, authController.getAllUsers);
+
+/**
+ * @route   PUT /api/auth/admin/users/:userId
+ * @desc    Cập nhật thông tin user
+ * @access  Admin only
+ */
+router.put('/admin/users/:userId', authenticateToken, requireAdmin, authController.updateUser);
+
+/**
+ * @route   DELETE /api/auth/admin/users/:userId
+ * @desc    Vô hiệu hóa tài khoản user
+ * @access  Admin only
+ */
+router.delete('/admin/users/:userId', authenticateToken, requireAdmin, authController.deleteUser);
+
 // Test route để kiểm tra API
 router.get('/test', (req, res) => {
   res.json({

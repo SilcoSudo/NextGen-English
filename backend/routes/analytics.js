@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
+const teacherAuth = require('../middleware/teacherAuth');
 const {
   getTeacherAnalytics,
   getAdminAnalytics,
@@ -9,8 +10,8 @@ const {
 } = require('../controllers/analyticsController');
 
 // Teacher analytics routes
-router.get('/teacher', authenticateToken, getTeacherAnalytics);
-router.get('/teacher/:teacherId', authenticateToken, getTeacherAnalytics);
+router.get('/teacher', authenticateToken, teacherAuth, getTeacherAnalytics);
+router.get('/teacher/:teacherId', authenticateToken, teacherAuth, getTeacherAnalytics);
 
 // Admin analytics routes (admin only)
 router.get('/admin', authenticateToken, requireAdmin, getAdminAnalytics);

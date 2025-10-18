@@ -589,6 +589,208 @@ const changePassword = async (req, res) => {
   }
 };
 
+// ADMIN FUNCTIONS - Quản lý người dùng
+
+// GET /api/auth/admin/users - Lấy danh sách tất cả users (chỉ admin)
+const getAllUsers = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      role = 'all',
+      status = 'all',
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    } = req.query;
+
+    // Build query
+    let query = {};
+
+    // Search functionality
+    if (search) {
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { username: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Role filter
+    if (role !== 'all') {
+      query.role = role;
+    }
+
+    // Status filter
+    if (status !== 'all') {
+      query.isActive = status === 'active';
+    }
+
+    // Pagination
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    // Sort options
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    // Get users with pagination
+    const users = await User.find(query)
+      .select('-password') // Exclude password
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .lean();
+
+    // Get total count for pagination
+    const totalUsers = await User.countDocuments(query);
+
+    // Format response
+    const formattedUsers = users.map(user => ({
+      id: user._id,
+      name: user.name,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      status: user.isActive ? 'active' : 'inactive',
+      joinDate: user.createdAt,
+      lastLogin: user.lastLogin || null,
+      avatar: user.avatar,
+      emailVerified: user.emailVerified,
+      profile: user.profile || {}
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        users: formattedUsers,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(totalUsers / parseInt(limit)),
+          totalUsers,
+          hasNext: parseInt(page) * parseInt(limit) < totalUsers,
+          hasPrev: parseInt(page) > 1
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Get all users error:', error);
+    res.status(500).json({
+      error: 'Lỗi máy chủ',
+      message: 'Có lỗi xảy ra khi lấy danh sách người dùng'
+    });
+  }
+};
+
+// PUT /api/auth/admin/users/:userId - Cập nhật thông tin user (chỉ admin)
+const updateUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { name, email, username, role, isActive, profile } = req.body;
+
+    // Validation
+    if (!userId) {
+      return res.status(400).json({
+        error: 'Thiếu thông tin',
+        message: 'User ID là bắt buộc'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: 'Không tìm thấy user',
+        message: 'Người dùng không tồn tại'
+      });
+    }
+
+    // Update fields
+    if (name !== undefined) user.name = name;
+    if (email !== undefined) user.email = email;
+    if (username !== undefined) user.username = username;
+    if (role !== undefined) {
+      if (!['student', 'teacher', 'admin'].includes(role)) {
+        return res.status(400).json({
+          error: 'Role không hợp lệ',
+          message: 'Role phải là student, teacher hoặc admin'
+        });
+      }
+      user.role = role;
+    }
+    if (isActive !== undefined) user.isActive = isActive;
+    if (profile !== undefined) user.profile = { ...user.profile, ...profile };
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Cập nhật người dùng thành công',
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        status: user.isActive ? 'active' : 'inactive',
+        profile: user.profile
+      }
+    });
+
+  } catch (error) {
+    console.error('Update user error:', error);
+    res.status(500).json({
+      error: 'Lỗi máy chủ',
+      message: 'Có lỗi xảy ra khi cập nhật người dùng'
+    });
+  }
+};
+
+// DELETE /api/auth/admin/users/:userId - Xóa user (chỉ admin)
+const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({
+        error: 'Thiếu thông tin',
+        message: 'User ID là bắt buộc'
+      });
+    }
+
+    // Prevent admin from deleting themselves
+    if (userId === req.user._id.toString()) {
+      return res.status(400).json({
+        error: 'Không thể xóa',
+        message: 'Không thể xóa tài khoản của chính mình'
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: 'Không tìm thấy user',
+        message: 'Người dùng không tồn tại'
+      });
+    }
+
+    // Soft delete by setting isActive to false instead of actually deleting
+    user.isActive = false;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Đã vô hiệu hóa tài khoản người dùng thành công'
+    });
+
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({
+      error: 'Lỗi máy chủ',
+      message: 'Có lỗi xảy ra khi xóa người dùng'
+    });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -601,5 +803,8 @@ module.exports = {
   resendVerificationEmail,
   forgotPassword,
   resetPassword,
-  changePassword
+  changePassword,
+  getAllUsers,
+  updateUser,
+  deleteUser
 };
