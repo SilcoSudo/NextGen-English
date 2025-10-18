@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../models/AuthContext";
+import LearningAnalytics from '../components/LearningAnalytics';
 
 function StudentDashboard() {
   const navigate = useNavigate();
@@ -319,6 +320,7 @@ function StudentDashboard() {
           {/* More cards có thể thêm ở đây */}
         </div>
       </div>
+      <LearningAnalytics /> {/* Add LearningAnalytics component */}
     </main>
   );
 }

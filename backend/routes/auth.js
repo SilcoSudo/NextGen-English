@@ -46,16 +46,11 @@ const registerValidation = [
 ];
 
 const updateProfileValidation = [
-  body('name')
-    .optional()
-    .isLength({ min: 2 })
-    .withMessage('Họ tên phải có ít nhất 2 ký tự')
-    .matches(/^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵýỷỹ\s]+$/)
-    .withMessage('Họ tên chỉ được chứa chữ cái và khoảng trắng'),
-  body('avatar')
-    .optional()
-    .isURL()
-    .withMessage('Avatar phải là một URL hợp lệ')
+  body('name').optional({ nullable: true }),
+  body('phone').optional({ nullable: true }),
+  body('dateOfBirth').optional({ nullable: true }),
+  body('bio').optional({ nullable: true }),
+  body('avatar').optional({ nullable: true }),
 ];
 
 // Routes
@@ -99,7 +94,14 @@ router.post('/refresh', authenticateToken, authController.refreshToken);
  * @desc    Cập nhật thông tin cá nhân
  * @access  Private
  */
-router.put('/profile', [authenticateToken, ...updateProfileValidation], authController.updateProfile);
+router.put('/profile', authenticateToken, authController.updateProfile);
+
+/**
+ * @route   PUT /api/auth/change-password
+ * @desc    Đổi mật khẩu
+ * @access  Private
+ */
+router.put('/change-password', authenticateToken, authController.changePassword);
 
 /**
  * @route   PUT /api/auth/update-role

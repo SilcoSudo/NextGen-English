@@ -45,9 +45,28 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: function() {
-      return `https://readdy.ai/api/search-image?query=cute%20cartoon%20avatar%20student%20headphones%20friendly%20smile%20digital%20art&width=60&height=60&seq=user${Date.now()}&orientation=squarish`;
+    default: 'https://api.dicebear.com/7.x/avataaars/svg?seed=kitty&backgroundColor=ffeaa7&hair=short01&hairColor=fdcb6e&skinColor=f39c12&eyes=default&mouth=smile'
+  },
+  phone: {
+    type: String,
+    trim: true,
+    validate: {
+      validator: function(v) {
+        // Allow empty/null values
+        if (!v) return true;
+        // Validate format if provided
+        return /^(\+84|84|0)[3|5|7|8|9][0-9]{8}$/.test(v);
+      },
+      message: 'Số điện thoại không đúng định dạng'
     }
+  },
+  dateOfBirth: {
+    type: Date
+  },
+  bio: {
+    type: String,
+    maxlength: [500, 'Giới thiệu không được quá 500 ký tự'],
+    trim: true
   },
   isActive: {
     type: Boolean,

@@ -14,7 +14,7 @@ const sampleUsers = [
     email: 'admin@nextgen.com',
     password: 'admin123',
     role: 'admin',
-    avatar: 'https://readdy.ai/api/search-image?query=professional%20admin%20avatar%20cartoon%20style%20business%20person%20with%20tie%2C%20friendly%20smile%2C%20digital%20art&width=60&height=60&seq=admin&orientation=squarish',
+    avatar: 'icon:{"iconName":"FaCat","color":"#FF6B6B","name":"Mèo"}',
     isActive: true,
     emailVerified: true,
     profile: {
@@ -34,7 +34,7 @@ const sampleUsers = [
     email: 'emma@student.com',
     password: 'student123',
     role: 'student',
-    avatar: 'https://readdy.ai/api/search-image?query=cute%20cartoon%20avatar%20of%20a%20young%20student%20with%20headphones%2C%20simple%20background%2C%20friendly%20smile%2C%20digital%20art%20style&width=60&height=60&seq=student&orientation=squarish',
+    avatar: 'icon:{"iconName":"FaDog","color":"#4ECDC4","name":"Chó"}',
     isActive: true,
     emailVerified: true,
     profile: {
@@ -63,7 +63,7 @@ const sampleUsers = [
     email: 'john@teacher.com',
     password: 'teacher123',
     role: 'teacher',
-    avatar: 'https://readdy.ai/api/search-image?query=professional%20teacher%20avatar%20cartoon%20style%20friendly%20educator%20with%20glasses&width=60&height=60&seq=teacher&orientation=squarish',
+    avatar: 'icon:{"iconName":"FaDragon","color":"#BB8FCE","name":"Rồng"}',
     isActive: true,
     emailVerified: true,
     profile: {
@@ -107,7 +107,7 @@ const sampleLessons = [
     tags: ['alphabet', 'beginner', 'kids', 'vocabulary', 'pronunciation'],
     stats: {
       totalViews: 245,
-      totalEnrollments: 150,
+      totalPurchases: 150,
       totalCompletions: 89,
       averageRating: 4.8,
       totalReviews: 45
@@ -146,7 +146,7 @@ const sampleLessons = [
     tags: ['numbers', 'counting', 'beginner', 'kids', 'math'],
     stats: {
       totalViews: 189,
-      totalEnrollments: 95,
+      totalPurchases: 95,
       totalCompletions: 67,
       averageRating: 4.6,
       totalReviews: 28
@@ -185,7 +185,7 @@ const sampleLessons = [
     tags: ['colors', 'vocabulary', 'beginner', 'kids', 'visual'],
     stats: {
       totalViews: 156,
-      totalEnrollments: 78,
+      totalPurchases: 78,
       totalCompletions: 52,
       averageRating: 4.7,
       totalReviews: 22
@@ -225,7 +225,7 @@ const sampleLessons = [
     tags: ['animals', 'vocabulary', 'elementary', 'nature', 'kids'],
     stats: {
       totalViews: 134,
-      totalEnrollments: 62,
+      totalPurchases: 62,
       totalCompletions: 41,
       averageRating: 4.9,
       totalReviews: 18
@@ -264,7 +264,7 @@ const sampleLessons = [
     tags: ['speaking', 'conversation', 'greetings', 'social', 'elementary'],
     stats: {
       totalViews: 298,
-      totalEnrollments: 180,
+      totalPurchases: 180,
       totalCompletions: 125,
       averageRating: 4.5,
       totalReviews: 67
@@ -303,7 +303,7 @@ const sampleLessons = [
     tags: ['family', 'vocabulary', 'relationships', 'elementary', 'personal'],
     stats: {
       totalViews: 0,
-      totalEnrollments: 0,
+      totalPurchases: 0,
       totalCompletions: 0,
       averageRating: 0,
       totalReviews: 0

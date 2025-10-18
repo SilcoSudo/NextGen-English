@@ -209,7 +209,7 @@ lessonProgressSchema.post('save', async function() {
   try {
     const User = require('./User');
     
-    // Check if lesson was just completed
+    // Check if lesson was just completed or had activity
     if (this.status === 'completed' && this.isModified('status')) {
       console.log(`✅ Lesson completed by user ${this.userId}`);
       
@@ -221,45 +221,12 @@ lessonProgressSchema.post('save', async function() {
           $inc: { 'stats.completedLessons': 1 }
         });
         
-        // Check streak and update if needed
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        if (user.stats.lastActiveDate) {
-          const lastActive = new Date(user.stats.lastActiveDate);
-          lastActive.setHours(0, 0, 0, 0);
-          
-          if (lastActive.getTime() === yesterday.getTime()) {
-            // Continue streak
-            await User.findByIdAndUpdate(this.userId, {
-              $inc: { 'stats.currentStreak': 1 },
-              $set: { 'stats.lastActiveDate': new Date() },
-              $max: { 'stats.longestStreak': user.stats.currentStreak + 1 }
-            });
-          } else if (lastActive.getTime() !== today.getTime()) {
-            // Reset streak
-            await User.findByIdAndUpdate(this.userId, {
-              $set: { 
-                'stats.currentStreak': 1,
-                'stats.lastActiveDate': new Date()
-              },
-              $max: { 'stats.longestStreak': Math.max(user.stats.longestStreak || 0, 1) }
-            });
-          }
-        } else {
-          // First lesson - start streak
-          await User.findByIdAndUpdate(this.userId, {
-            $set: { 
-              'stats.currentStreak': 1,
-              'stats.longestStreak': 1,
-              'stats.lastActiveDate': new Date()
-            }
-          });
-        }
+        // Update streak based on activity
+        await updateUserStreak(this.userId);
       }
+    } else if (this.isModified('watchTime') && this.watchTime > 0) {
+      // Update streak on any watch activity (not just completion)
+      await updateUserStreak(this.userId);
     }
   } catch (error) {
     console.error('Stats update error in Progress post-save:', error);
@@ -326,11 +293,24 @@ lessonProgressSchema.methods.startWatching = function() {
 
 // Update watch progress
 lessonProgressSchema.methods.updateProgress = function(watchTime, totalTime) {
-  this.watchTime = Math.max(this.watchTime, watchTime); // Don't allow going backwards
+  // Validate inputs
+  if (typeof watchTime !== 'number' || watchTime < 0) {
+    throw new Error('watchTime must be a positive number');
+  }
+  if (typeof totalTime !== 'number' || totalTime <= 0) {
+    throw new Error('totalTime must be a positive number greater than 0');
+  }
+  
+  // Update watchTime (allow going backwards for rewatching)
+  this.watchTime = Math.max(0, Math.min(watchTime, totalTime));
   this.totalTime = totalTime;
   
-  // Calculate progress percentage
-  this.progressPercentage = Math.round((this.watchTime / this.totalTime) * 100);
+  // Calculate progress percentage (capped at 100)
+  if (this.totalTime > 0) {
+    this.progressPercentage = Math.min(100, Math.round((this.watchTime / this.totalTime) * 100));
+  } else {
+    this.progressPercentage = 0;
+  }
   
   // Auto-complete if watched 90% or more
   if (this.progressPercentage >= 90 && this.status !== 'completed') {
@@ -417,6 +397,56 @@ lessonProgressSchema.methods.processPayment = function(amount, paymentMethod, tr
   };
   
   return this.save();
+};
+
+// Helper function to update user streak
+const updateUserStreak = async (userId) => {
+  try {
+    const User = require('./User');
+    const user = await User.findById(userId);
+    if (!user) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (user.stats.lastActiveDate) {
+      const lastActive = new Date(user.stats.lastActiveDate);
+      lastActive.setHours(0, 0, 0, 0);
+
+      if (lastActive.getTime() === yesterday.getTime()) {
+        // Continue streak
+        await User.findByIdAndUpdate(userId, {
+          $inc: { 'stats.currentStreak': 1 },
+          $set: { 'stats.lastActiveDate': today },
+          $max: { 'stats.longestStreak': user.stats.currentStreak + 1 }
+        });
+      } else if (lastActive.getTime() < yesterday.getTime()) {
+        // Streak broken - reset to 1
+        await User.findByIdAndUpdate(userId, {
+          $set: {
+            'stats.currentStreak': 1,
+            'stats.lastActiveDate': today
+          },
+          $max: { 'stats.longestStreak': Math.max(user.stats.longestStreak || 0, 1) }
+        });
+      }
+      // If lastActive is today, don't update (already counted for today)
+    } else {
+      // First activity - start streak
+      await User.findByIdAndUpdate(userId, {
+        $set: {
+          'stats.currentStreak': 1,
+          'stats.longestStreak': 1,
+          'stats.lastActiveDate': today
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error updating user streak:', error);
+  }
 };
 
 // Create model

@@ -235,7 +235,7 @@ const EditLesson = ({ lesson, onLessonUpdated, onCancel }) => {
       };
 
       // Send request
-      xhr.open('PUT', `http://localhost:5000/api/lessons/${lesson._id}`);
+      xhr.open('PUT', `${window.location.origin}/api/lessons/${lesson._id}`);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.send(updateData);
 
@@ -438,7 +438,7 @@ const EditLesson = ({ lesson, onLessonUpdated, onCancel }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
             />
             <p className="text-sm text-gray-500 mt-1">
-              Định dạng: MP4, WebM, OGG, AVI, MOV. Tối đa 500MB.
+              Định dạng: MP4, AVI, MOV, WebM, OGG, 3GP, WMV, MKV, FLV, M4V, TS, MPG. Tối đa 500MB.
             </p>
             {videoFile && (
               <p className="text-sm text-blue-600 mt-1">
@@ -461,7 +461,7 @@ const EditLesson = ({ lesson, onLessonUpdated, onCancel }) => {
                 </p>
                 <div className="flex items-center gap-3">
                   <img 
-                    src={`http://localhost:5000${lesson.thumbnailUrl}`}
+                    src={`${window.location.origin}/api/images/${lesson.thumbnailUrl.split('/').pop()}`}
                     alt="Current thumbnail"
                     className="w-16 h-16 object-cover rounded border"
                     onError={(e) => {

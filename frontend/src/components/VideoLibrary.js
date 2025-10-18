@@ -23,7 +23,7 @@ const VideoLibrary = ({ onVideoSelect, isModal = false, onClose }) => {
         return;
       }
       
-      const response = await fetch('http://localhost:5000/api/upload/my-videos', {
+      const response = await fetch(`${window.location.origin}/api/upload/my-videos`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -53,7 +53,7 @@ const VideoLibrary = ({ onVideoSelect, isModal = false, onClose }) => {
         return;
       }
       
-      const response = await fetch(`http://localhost:5000/api/upload/video/${filename}`, {
+      const response = await fetch(`${window.location.origin}/api/upload/video/${filename}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

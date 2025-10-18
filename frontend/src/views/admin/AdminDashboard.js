@@ -22,7 +22,7 @@ function AdminDashboard() {
   const fetchAdminStats = async () => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/analytics/admin', {
+      const response = await fetch(`${window.location.origin}/api/analytics/admin`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

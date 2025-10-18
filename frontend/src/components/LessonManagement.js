@@ -30,7 +30,7 @@ const LessonManagement = ({ courses, onLessonUpdated, onLessonDeleted }) => {
         return;
       }
       
-      const response = await fetch(`http://localhost:5000/api/lessons/${courseId}/status`, {
+      const response = await fetch(`${window.location.origin}/api/lessons/${courseId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const LessonManagement = ({ courses, onLessonUpdated, onLessonDeleted }) => {
         return;
       }
       
-      const response = await fetch(`http://localhost:5000/api/lessons/${courseId}`, {
+      const response = await fetch(`${window.location.origin}/api/lessons/${courseId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

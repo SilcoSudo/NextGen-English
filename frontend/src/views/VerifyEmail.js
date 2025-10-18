@@ -20,7 +20,7 @@ function VerifyEmail() {
       }
 
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/verify-email`, {
+        const response = await fetch(`${window.location.origin}/api/auth/verify-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -61,7 +61,7 @@ function VerifyEmail() {
     setResending(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/request-password-reset`, {
+      const response = await fetch(`${window.location.origin}/api/auth/request-password-reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

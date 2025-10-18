@@ -52,18 +52,35 @@ const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     'video/mp4',
     'video/mpeg',
-    'video/quicktime',
+    'video/quicktime', // .mov
     'video/x-msvideo', // .avi
     'video/webm',
     'video/ogg',
-    'video/3gpp',
-    'video/x-ms-wmv'
+    'video/3gpp', // .3gp
+    'video/x-ms-wmv', // .wmv
+    'video/x-matroska', // .mkv
+    'video/x-flv', // .flv
+    'video/x-ms-asf', // .asf
+    'video/x-m4v', // .m4v
+    'video/vnd.dlna.mpeg-tts', // .m2ts
+    'video/MP2T', // .ts
+    'video/x-msvideo', // .avi (duplicate but safe)
+    'video/quicktime', // .mov (duplicate but safe)
   ];
-  
-  if (allowedMimeTypes.includes(file.mimetype)) {
+
+  // Kiểm tra extension file nếu MIME type không rõ ràng
+  const allowedExtensions = [
+    '.mp4', '.avi', '.mov', '.webm', '.ogg', '.3gp', '.wmv',
+    '.mkv', '.flv', '.asf', '.m4v', '.m2ts', '.ts', '.mpg', '.mpeg'
+  ];
+
+  const fileExt = path.extname(file.originalname).toLowerCase();
+
+  // Cho phép nếu MIME type hợp lệ HOẶC extension hợp lệ
+  if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(fileExt)) {
     cb(null, true);
   } else {
-    const error = new Error('Chỉ chấp nhận file video (MP4, AVI, MOV, WebM, OGG, 3GP, WMV)');
+    const error = new Error(`Chỉ chấp nhận file video. Định dạng được hỗ trợ: MP4, AVI, MOV, WebM, OGG, 3GP, WMV, MKV, FLV, ASF, M4V, M2TS, TS, MPG, MPEG. File của bạn: ${file.originalname} (${file.mimetype})`);
     error.code = 'INVALID_FILE_TYPE';
     cb(error, false);
   }

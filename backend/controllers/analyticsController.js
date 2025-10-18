@@ -1,6 +1,54 @@
-const Lesson = require('../models/Lesson');
-const LessonProgress = require('../models/Progress');
-const User = require('../models/User');
+// GET /api/analytics/streak - Get current user's learning streak
+const getUserStreak = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    
+    const user = await User.findById(userId).select('stats');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    // Calculate if streak is still active (check if last activity was yesterday or today)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    let currentStreak = user.stats.currentStreak || 0;
+    const lastActiveDate = user.stats.lastActiveDate ? new Date(user.stats.lastActiveDate) : null;
+    
+    if (lastActiveDate) {
+      lastActiveDate.setHours(0, 0, 0, 0);
+      
+      // If last activity was more than 1 day ago, streak is broken
+      const daysSinceLastActivity = Math.floor((today - lastActiveDate) / (1000 * 60 * 60 * 24));
+      if (daysSinceLastActivity > 1) {
+        currentStreak = 0;
+        // Optionally update the database, but for now just return 0
+      }
+    }
+    
+    res.json({
+      success: true,
+      data: {
+        currentStreak,
+        longestStreak: user.stats.longestStreak || 0,
+        lastActiveDate: user.stats.lastActiveDate
+      }
+    });
+    
+  } catch (error) {
+    console.error('Streak fetch error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi lấy streak'
+    });
+  }
+};
 
 // GET /api/analytics/teacher/:teacherId - Thống kê cho giáo viên
 const getTeacherAnalytics = async (req, res) => {
@@ -384,5 +432,6 @@ const calculateLearningStreak = (progresses) => {
 module.exports = {
   getTeacherAnalytics,
   getAdminAnalytics,
-  getStudentAnalytics
+  getStudentAnalytics,
+  getUserStreak
 };

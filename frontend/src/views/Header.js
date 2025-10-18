@@ -36,9 +36,9 @@ function Header() {
     };
   }, [isProfileDropdownOpen]);
   
-  // Ẩn header khi ở trang admin hoặc teacher dashboard  
-  if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/teacher')) {
-    return null;
+  // Ẩn header khi ở trang admin
+  if (location.pathname.startsWith('/admin')) {
+    return null; // Only hide Header for admin routes
   }
   
   return (
@@ -47,12 +47,13 @@ function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-500 mr-1 sm:mr-2">
-              <i className="ri-graduation-cap-line"></i>
-            </div>
+            <img
+              src="/nextgen_logo.jpg"
+              alt="NextGen Logo"
+              className="h-10 w-auto mr-2"
+            />
             <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-              <span className="hidden sm:inline">NextGenEnglish</span>
-              <span className="sm:hidden">NextGen</span>
+              NextGen English
             </h1>
           </div>
 
@@ -190,8 +191,7 @@ function Header() {
                 {isProfileDropdownOpen && (
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                     <Link
-                      to={user?.role === 'admin' ? '/admin' : 
-                          user?.role === 'teacher' ? '/teacher' : '/dashboard'}
+                      to="/profile"
                       className="flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                       onClick={() => setIsProfileDropdownOpen(false)}
                     >
@@ -355,8 +355,7 @@ function Header() {
                   {/* Mobile User Actions */}
                   <div className="space-y-2">
                     <Link
-                      to={user?.role === 'admin' ? '/admin' : 
-                          user?.role === 'teacher' ? '/teacher' : '/dashboard'}
+                      to="/profile"
                       className="w-full flex items-center space-x-3 px-4 py-3 bg-white hover:bg-blue-50 rounded-lg text-sm font-medium transition duration-300 text-gray-700 hover:text-blue-600 border border-gray-200"
                       onClick={() => setIsMenuOpen(false)}
                     >

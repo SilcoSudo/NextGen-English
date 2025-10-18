@@ -856,18 +856,32 @@ const updateLessonProgress = async (req, res) => {
     const userId = req.user._id || req.user.id;
     const { watchTime, totalTime, completed = false } = req.body;
 
-    // Validation
-    if (typeof watchTime !== 'number' || watchTime < 0) {
+    console.log('Update progress request:', {
+      lessonId,
+      userId,
+      watchTime: typeof watchTime,
+      totalTime: typeof totalTime,
+      completed,
+      body: req.body
+    });
+
+    // Parse and validate watchTime
+    let parsedWatchTime = parseFloat(watchTime);
+    if (isNaN(parsedWatchTime) || parsedWatchTime < 0) {
       return res.status(400).json({
         success: false,
-        message: 'Thời gian xem không hợp lệ'
+        message: 'Thời gian xem không hợp lệ. Phải là số >= 0',
+        received: watchTime
       });
     }
 
-    if (typeof totalTime !== 'number' || totalTime <= 0) {
+    // Parse and validate totalTime
+    let parsedTotalTime = parseFloat(totalTime);
+    if (isNaN(parsedTotalTime) || parsedTotalTime <= 0) {
       return res.status(400).json({
         success: false,
-        message: 'Tổng thời gian video không hợp lệ'
+        message: 'Tổng thời gian video không hợp lệ. Phải là số > 0',
+        received: totalTime
       });
     }
 
@@ -907,7 +921,7 @@ const updateLessonProgress = async (req, res) => {
       await progress.completeWatching();
     } else {
       // Cập nhật progress bình thường
-      await progress.updateProgress(watchTime, totalTime);
+      await progress.updateProgress(parsedWatchTime, parsedTotalTime);
     }
 
     // Populate lại để trả về thông tin đầy đủ

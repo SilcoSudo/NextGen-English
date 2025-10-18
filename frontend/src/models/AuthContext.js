@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('🔐 Attempting login with:', { email: userData.email });
       
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${window.location.origin}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${window.location.origin}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,6 +114,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedUserData) => {
+    setUser(updatedUserData);
+    localStorage.setItem('user', JSON.stringify(updatedUserData));
+  };
+
   const logout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
@@ -127,6 +132,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    updateUser,
     logout
   };
 

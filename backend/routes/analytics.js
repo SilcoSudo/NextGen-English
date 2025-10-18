@@ -4,7 +4,8 @@ const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const {
   getTeacherAnalytics,
   getAdminAnalytics,
-  getStudentAnalytics
+  getStudentAnalytics,
+  getUserStreak
 } = require('../controllers/analyticsController');
 
 // Teacher analytics routes
@@ -17,5 +18,8 @@ router.get('/admin', authenticateToken, requireAdmin, getAdminAnalytics);
 // Student analytics routes
 router.get('/student', authenticateToken, getStudentAnalytics);
 router.get('/student/:studentId', authenticateToken, getStudentAnalytics);
+
+// Streak route
+router.get('/streak', authenticateToken, getUserStreak);
 
 module.exports = router;

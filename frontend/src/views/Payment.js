@@ -31,7 +31,7 @@ function Payment() {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/lessons/${actualLessonId}`);
+        const response = await fetch(`${window.location.origin}/api/lessons/${actualLessonId}`);
         const data = await response.json();
         
         if (data.success) {
@@ -64,28 +64,54 @@ function Payment() {
     
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/lessons/enroll', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          lessonId: actualLessonId,
-          paymentInfo: formData
-        })
-      });
-
-      const data = await response.json();
       
-      if (data.success) {
-        setIsProcessing(false);
-        setIsSuccess(true);
-        setTimeout(() => {
-          navigate('/my-lessons');
-        }, 2000);
+      // Kiểm tra lesson có miễn phí không
+      if (lesson.price === 0) {
+        // Xử lý đăng ký miễn phí
+        const response = await fetch(`${window.location.origin}/api/lessons/enroll`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            lessonId: actualLessonId,
+            paymentInfo: formData
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          setIsProcessing(false);
+          setIsSuccess(true);
+          setTimeout(() => {
+            navigate('/my-lessons');
+          }, 2000);
+        } else {
+          throw new Error(data.message || 'Đăng ký khóa học thất bại');
+        }
       } else {
-        throw new Error(data.message || 'Đăng ký khóa học thất bại');
+        // Xử lý thanh toán có phí với MoMo
+        const response = await fetch(`${window.location.origin}/api/payment/momo/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            lessonId: actualLessonId
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          // Redirect đến trang thanh toán MoMo
+          window.location.href = data.data.payUrl;
+        } else {
+          throw new Error(data.message || 'Tạo thanh toán thất bại');
+        }
       }
     } catch (err) {
       console.error('Payment error:', err);

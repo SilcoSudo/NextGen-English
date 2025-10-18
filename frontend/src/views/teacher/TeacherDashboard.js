@@ -8,6 +8,7 @@ import TeacherNotifications from '../../components/TeacherNotifications';
 import TeacherSettings from '../../components/TeacherSettings';
 import TeacherAnalytics from '../../components/TeacherAnalytics';
 import TeacherHelp from '../../components/TeacherHelp';
+import LearningAnalytics from '../../components/LearningAnalytics';
 
 const TeacherDashboard = () => {
   const { user } = useAuth();
@@ -52,7 +53,7 @@ const TeacherDashboard = () => {
       }
       
       // Fetch teacher's courses
-      const coursesResponse = await fetch('http://localhost:5000/api/lessons/teacher/my-lessons', {
+      const coursesResponse = await fetch(`${window.location.origin}/api/lessons/teacher/my-lessons`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -407,7 +408,10 @@ const TeacherDashboard = () => {
         )}
 
         {activeTab === 'analytics' && (
-          <TeacherAnalytics courses={courses} />
+          <div>
+            <TeacherAnalytics courses={courses} />
+            <LearningAnalytics isTeacher={true} />
+          </div>
         )}
       </div>
 

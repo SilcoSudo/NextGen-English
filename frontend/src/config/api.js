@@ -3,12 +3,12 @@ const config = {
   // Production API URL
   API_BASE_URL: process.env.NODE_ENV === 'production' 
     ? 'https://api.nextgenenglish.id.vn/api'
-    : 'http://localhost:5000/api',
+    : `${window.location.origin}/api`,
     
   // WebSocket URL (if needed)
   WS_URL: process.env.NODE_ENV === 'production'
     ? 'wss://api.nextgenenglish.id.vn'
-    : 'ws://localhost:5000',
+    : `ws://${window.location.hostname}:5000`,
     
   // Frontend URL
   FRONTEND_URL: process.env.NODE_ENV === 'production'

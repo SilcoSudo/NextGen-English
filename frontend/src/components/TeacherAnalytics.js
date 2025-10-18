@@ -20,7 +20,7 @@ const TeacherAnalytics = ({ courses }) => {
     
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/analytics/teacher`, {
+      const response = await fetch(`${window.location.origin}/api/analytics/teacher`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

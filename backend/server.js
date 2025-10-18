@@ -19,8 +19,10 @@ const healthRoutes = require('./routes/health');
 
 const app = express();
 
-// Trust proxy for Cloudflare
-app.set('trust proxy', true);
+// Trust proxy for Cloudflare (only in production)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // Security middleware with CSP disabled for now
 app.use(helmet({
@@ -34,6 +36,10 @@ const limiter = rateLimit({
   message: {
     error: 'Quá nhiều yêu cầu từ IP này, vui lòng thử lại sau.',
   },
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Skip rate limiting for trusted proxies in production
+  skip: (req, res) => process.env.NODE_ENV === 'production' && req.ip === req.connection.remoteAddress
 });
 app.use(limiter);
 
@@ -90,6 +96,192 @@ app.use('/api/auth', authRoutes);
 app.use('/api/lessons', lessonRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/payment', paymentRoutes);
+app.use('/api', healthRoutes);
+
+// Serve static uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, path) => {
+    // Allow CORS for static files
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
+// Serve video files with CORS
+app.get('/api/videos/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const videoPath = path.join(__dirname, 'uploads', 'videos', filename);
+
+  // Kiểm tra file có tồn tại không
+  if (!fs.existsSync(videoPath)) {
+    return res.status(404).json({
+      success: false,
+      message: 'Video không tồn tại'
+    });
+  }
+
+  try {
+    // Lấy thông tin file
+    const stat = fs.statSync(videoPath);
+    const fileSize = stat.size;
+    const range = req.headers.range;
+
+    // Detect MIME type based on file extension
+    const ext = path.extname(filename).toLowerCase();
+    const mimeTypes = {
+      '.mp4': 'video/mp4',
+      '.avi': 'video/x-msvideo',
+      '.mov': 'video/quicktime',
+      '.webm': 'video/webm',
+      '.ogg': 'video/ogg',
+      '.3gp': 'video/3gpp',
+      '.wmv': 'video/x-ms-wmv',
+      '.mkv': 'video/x-matroska',
+      '.flv': 'video/x-flv',
+      '.asf': 'video/x-ms-asf',
+      '.m4v': 'video/x-m4v',
+      '.m2ts': 'video/vnd.dlna.mpeg-tts',
+      '.ts': 'video/MP2T',
+      '.mpg': 'video/mpeg',
+      '.mpeg': 'video/mpeg'
+    };
+    const contentType = mimeTypes[ext] || 'video/mp4';
+
+    // Set CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Range');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+
+    if (range) {
+      // Hỗ trợ streaming với range requests
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      let end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+      // Validate range
+      if (start >= fileSize || end >= fileSize) {
+        res.status(416).set({
+          'Content-Range': `bytes */${fileSize}`
+        });
+        return res.end();
+      }
+
+      // Ensure end is not greater than file size
+      end = Math.min(end, fileSize - 1);
+      const chunksize = (end - start) + 1;
+
+      const file = fs.createReadStream(videoPath, { start, end });
+      const head = {
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Accept-Ranges': 'bytes',
+        'Content-Length': chunksize,
+        'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        'ETag': `"${stat.mtime.getTime()}-${fileSize}"`,
+        'Last-Modified': stat.mtime.toUTCString()
+      };
+
+      res.writeHead(206, head);
+      file.pipe(res);
+
+      file.on('error', (err) => {
+        console.error('Video streaming error:', err);
+        res.end();
+      });
+
+    } else {
+      // Serve toàn bộ file
+      const head = {
+        'Content-Length': fileSize,
+        'Content-Type': contentType,
+        'Accept-Ranges': 'bytes',
+        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        'ETag': `"${stat.mtime.getTime()}-${fileSize}"`,
+        'Last-Modified': stat.mtime.toUTCString()
+      };
+      res.writeHead(200, head);
+
+      const stream = fs.createReadStream(videoPath);
+      stream.pipe(res);
+
+      stream.on('error', (err) => {
+        console.error('Video serving error:', err);
+        res.end();
+      });
+    }
+  } catch (error) {
+    console.error('Video endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi phát video'
+    });
+  }
+});
+
+// Serve image files with CORS
+app.get('/api/images/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, 'uploads', 'images', filename);
+
+  // Kiểm tra file có tồn tại không
+  if (!fs.existsSync(imagePath)) {
+    return res.status(404).json({
+      success: false,
+      message: 'Hình ảnh không tồn tại'
+    });
+  }
+
+  try {
+    // Detect MIME type
+    const ext = path.extname(filename).toLowerCase();
+    const mimeTypes = {
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.png': 'image/png',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.svg': 'image/svg+xml',
+      '.bmp': 'image/bmp',
+      '.ico': 'image/x-icon'
+    };
+    const contentType = mimeTypes[ext] || 'image/jpeg';
+
+    // Get file stats for caching
+    const stat = fs.statSync(imagePath);
+
+    // Set headers
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache for 24 hours
+    res.setHeader('ETag', `"${stat.mtime.getTime()}-${stat.size}"`);
+    res.setHeader('Last-Modified', stat.mtime.toUTCString());
+
+    // Stream the image
+    const stream = fs.createReadStream(imagePath);
+    stream.pipe(res);
+
+    stream.on('error', (err) => {
+      console.error('Image serving error:', err);
+      res.status(500).json({
+        success: false,
+        message: 'Lỗi server khi tải hình ảnh'
+      });
+    });
+
+  } catch (error) {
+    console.error('Image endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi server khi xử lý hình ảnh'
+    });
+  }
+});
 
 // Serve static files from React build (Production)
 if (process.env.NODE_ENV === 'production') {
@@ -109,146 +301,6 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(buildPath, 'index.html'));
   });
 }
-app.use('/api/payment', paymentRoutes);
-app.use('/api', healthRoutes);
-
-// Serve static uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Serve video files
-app.get('/api/videos/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const videoPath = path.join(__dirname, 'uploads', 'videos', filename);
-  
-  // Kiểm tra file có tồn tại không
-  if (!fs.existsSync(videoPath)) {
-    return res.status(404).json({
-      success: false,
-      message: 'Video không tồn tại'
-    });
-  }
-  
-  try {
-    // Lấy thông tin file
-    const stat = fs.statSync(videoPath);
-    const fileSize = stat.size;
-    const range = req.headers.range;
-    
-    // Detect MIME type based on file extension
-    const ext = path.extname(filename).toLowerCase();
-    const mimeTypes = {
-      '.mp4': 'video/mp4',
-      '.avi': 'video/x-msvideo',
-      '.mov': 'video/quicktime',
-      '.webm': 'video/webm',
-      '.ogg': 'video/ogg',
-      '.wmv': 'video/x-ms-wmv',
-      '.3gp': 'video/3gpp'
-    };
-    const contentType = mimeTypes[ext] || 'video/mp4';
-    
-    if (range) {
-      // Hỗ trợ streaming với range requests
-      const parts = range.replace(/bytes=/, "").split("-");
-      const start = parseInt(parts[0], 10);
-      let end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-      
-      // Validate range
-      if (start >= fileSize || end >= fileSize) {
-        res.status(416).set({
-          'Content-Range': `bytes */${fileSize}`
-        });
-        return res.end();
-      }
-      
-      // Ensure end is not greater than file size
-      end = Math.min(end, fileSize - 1);
-      const chunksize = (end - start) + 1;
-      
-      const file = fs.createReadStream(videoPath, { start, end });
-      const head = {
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunksize,
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
-        'ETag': `"${stat.mtime.getTime()}-${fileSize}"`,
-        'Last-Modified': stat.mtime.toUTCString()
-      };
-      
-      res.writeHead(206, head);
-      file.pipe(res);
-      
-      file.on('error', (err) => {
-        console.error('Video streaming error:', err);
-        res.end();
-      });
-      
-    } else {
-      // Serve toàn bộ file
-      const head = {
-        'Content-Length': fileSize,
-        'Content-Type': contentType,
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
-        'ETag': `"${stat.mtime.getTime()}-${fileSize}"`,
-        'Last-Modified': stat.mtime.toUTCString()
-      };
-      res.writeHead(200, head);
-      
-      const stream = fs.createReadStream(videoPath);
-      stream.pipe(res);
-      
-      stream.on('error', (err) => {
-        console.error('Video serving error:', err);
-        res.end();
-      });
-    }
-  } catch (error) {
-    console.error('Video endpoint error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi server khi phát video'
-    });
-  }
-});
-
-// Serve image files
-app.get('/api/images/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const imagePath = path.join(__dirname, 'uploads', 'images', filename);
-  
-  // Kiểm tra file có tồn tại không
-  if (!fs.existsSync(imagePath)) {
-    return res.status(404).json({
-      success: false,
-      message: 'Hình ảnh không tồn tại'
-    });
-  }
-  
-  // Lấy extension để set content type
-  const ext = path.extname(filename).toLowerCase();
-  let contentType = 'image/jpeg'; // default
-  
-  switch (ext) {
-    case '.png':
-      contentType = 'image/png';
-      break;
-    case '.jpg':
-    case '.jpeg':
-      contentType = 'image/jpeg';
-      break;
-    case '.webp':
-      contentType = 'image/webp';
-      break;
-  }
-  
-  // Set headers và serve file
-  res.setHeader('Content-Type', contentType);
-  res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache 1 năm
-  
-  fs.createReadStream(imagePath).pipe(res);
-});
 
 // Root endpoint
 app.get('/', (req, res) => {

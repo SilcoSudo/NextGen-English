@@ -177,7 +177,7 @@ const CreateLesson = ({ onLessonCreated, onCancel }) => {
       console.log('Sending FormData with files');
 
       const token = localStorage.getItem('authToken');
-      const response = await fetch('http://localhost:5000/api/lessons', {
+      const response = await fetch(`${window.location.origin}/api/lessons`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -374,7 +374,7 @@ const CreateLesson = ({ onLessonCreated, onCancel }) => {
                     Kéo thả file vào đây hoặc click để chọn
                   </p>
                   <p className="text-xs text-gray-400">
-                    Hỗ trợ: MP4, AVI, MOV, WebM (tối đa 500MB)
+                    Hỗ trợ: MP4, AVI, MOV, WebM, OGG, 3GP, WMV, MKV, FLV, M4V, TS, MPG (tối đa 500MB)
                   </p>
                 </label>
               </div>

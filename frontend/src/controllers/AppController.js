@@ -11,6 +11,9 @@ import LessonWatch from "../views/LessonWatch";
 import Home from "../views/Home";
 
 import Payment from "../views/Payment";
+import PaymentSuccess from "../views/PaymentSuccess";
+import PaymentFailure from "../views/PaymentFailure";
+import UserProfile from "../views/UserProfile";
 import LoginPage from "../views/LoginPage";
 import RegisterPage from "../views/RegisterPage";
 import ForgotPassword from "../views/ForgotPassword";
@@ -65,7 +68,6 @@ function App() {
               <ExploreLessons />
             </>
           } />
-          <Route path="/courses" element={<Navigate to="/lessons" replace />} />
           <Route path="/my-lessons" element={
             <ProtectedRoute>
               <>
@@ -74,7 +76,6 @@ function App() {
               </>
             </ProtectedRoute>
           } />
-          <Route path="/my-courses" element={<Navigate to="/my-lessons" replace />} />
           <Route path="/lessons/:id/watch" element={
             <ProtectedRoute>
               <>
@@ -94,21 +95,42 @@ function App() {
             </ProtectedRoute>
           } />
           
+          {/* User Profile Route */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Header />
+              <UserProfile />
+            </ProtectedRoute>
+          } />
+          <Route path="/payment/success" element={
+            <ProtectedRoute>
+              <>
+                <Header />
+                <PaymentSuccess />
+              </>
+            </ProtectedRoute>
+          } />
+          <Route path="/payment/failure" element={
+            <ProtectedRoute>
+              <>
+                <Header />
+                <PaymentFailure />
+              </>
+            </ProtectedRoute>
+          } />
+          
           {/* Teacher Routes */}
           <Route path="/teacher" element={
             <TeacherRoute>
+              <Header />
               <TeacherDashboard />
             </TeacherRoute>
           } />
           
-          {/* Teacher Preview (Demo UI/UX) */}
-          <Route path="/teacher-preview" element={<TeacherPreview />} />
-          
-
-          
           {/* Admin Routes */}
           <Route path="/admin" element={
             <AdminRoute>
+              <Header />
               <AdminHome />
             </AdminRoute>
           } />
@@ -118,16 +140,19 @@ function App() {
           
           <Route path="/admin/lessons" element={
             <AdminRoute>
+              <Header />
               <CourseManagement />
             </AdminRoute>
           } />
           <Route path="/admin/users" element={
             <AdminRoute>
+              <Header />
               <UserManagement />
             </AdminRoute>
           } />
           <Route path="/admin/analytics" element={
             <AdminRoute>
+              <Header />
               <RevenueChart />
             </AdminRoute>
           } />

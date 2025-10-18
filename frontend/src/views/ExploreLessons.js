@@ -2,9 +2,22 @@ import React, { useState, useMemo, useEffect } from "react";
 import LessonCard from "./LessonCard";
 import { useAuth } from "../models/AuthContext";
 
-const ageOptions = ["6-8 tuổi", "8-10 tuổi"];
-const levelOptions = ["Cơ bản", "Trung cấp", "Nâng cao"];
-const skillOptions = ["Nói", "Nghe", "Đọc", "Viết"];
+const ageOptions = ["6-8", "8-10"];
+const levelOptions = [
+  { value: "beginner", label: "Cơ bản" },
+  { value: "elementary", label: "Sơ cấp" },
+  { value: "intermediate", label: "Trung cấp" },
+  { value: "advanced", label: "Nâng cao" }
+];
+const skillOptions = [
+  { value: "speaking", label: "Nói" },
+  { value: "listening", label: "Nghe" },
+  { value: "reading", label: "Đọc" },
+  { value: "writing", label: "Viết" },
+  { value: "vocabulary", label: "Từ vựng" },
+  { value: "grammar", label: "Ngữ pháp" },
+  { value: "pronunciation", label: "Phát âm" }
+];
 
 function ExploreLessons() {
   const { user } = useAuth();
@@ -16,6 +29,8 @@ function ExploreLessons() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [viewMode, setViewMode] = useState("grid");
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(500000);
 
   // Transform database lesson object to safe display format
   const transformLesson = (lesson) => {
@@ -32,8 +47,63 @@ function ExploreLessons() {
       ageGroup: String(lesson.ageGroup || 'all'),
       category: String(lesson.category || 'general'),
       
-      // Safe thumbnail handling
-      thumbnail: lesson.thumbnail || lesson.video?.thumbnail || 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=250&fit=crop&auto=format&q=80',
+      // Safe thumbnail handling with comprehensive URL conversion
+      thumbnail: (() => {
+        const thumb = lesson.thumbnail || lesson.video?.thumbnail || 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=250&fit=crop&auto=format&q=80';
+        
+        // Handle different URL formats from database
+        try {
+          // If it's already a full URL with http/https
+          if (thumb.startsWith('http://') || thumb.startsWith('https://')) {
+            // Convert localhost URLs to current domain
+            if (thumb.includes('localhost:5000')) {
+              const url = new URL(thumb);
+              const filename = url.pathname.split('/').pop();
+              return `${window.location.origin}/api/images/${filename}`;
+            }
+            // For other domains, check if it's our API domain
+            const url = new URL(thumb);
+            if (url.hostname === window.location.hostname) {
+              // Same domain, return as is
+              return thumb;
+            } else {
+              // External URL, return as is (like Unsplash)
+              return thumb;
+            }
+          }
+          
+          // Handle relative URLs (starting with /)
+          if (thumb.startsWith('/')) {
+            // If it starts with /api/, it's already a proper API URL
+            if (thumb.startsWith('/api/')) {
+              return `${window.location.origin}${thumb}`;
+            }
+            // If it starts with /uploads/, convert to API endpoint
+            if (thumb.startsWith('/uploads/')) {
+              const filename = thumb.split('/').pop();
+              return `${window.location.origin}/api/images/${filename}`;
+            }
+            // Other relative URLs, prepend origin
+            return `${window.location.origin}${thumb}`;
+          }
+          
+          // Handle URLs without protocol (relative paths)
+          if (!thumb.includes('://')) {
+            // If it looks like a filename, assume it's in uploads/images/
+            if (thumb.includes('.') && !thumb.includes('/')) {
+              return `${window.location.origin}/api/images/${thumb}`;
+            }
+            // Otherwise treat as relative path
+            return `${window.location.origin}/${thumb}`;
+          }
+          
+          // Fallback for any other format
+          return thumb;
+        } catch (error) {
+          console.warn('Error processing thumbnail URL:', thumb, error);
+          return 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=250&fit=crop&auto=format&q=80';
+        }
+      })(),
       
       // Skills array
       skills: Array.isArray(lesson.skills) ? lesson.skills : [],
@@ -81,7 +151,9 @@ function ExploreLessons() {
       // Additional properties from API
       totalReviews: lesson.stats?.totalReviews || 0,
       isPublished: lesson.settings?.isPublished || true,
-      isPurchased: lesson.isPurchased || false // This would come from user context
+      
+      // IMPORTANT: Keep isPurchased from backend API response - DO NOT override with false
+      isPurchased: lesson.isPurchased === true
     };
   };
 
@@ -95,12 +167,16 @@ function ExploreLessons() {
           'Content-Type': 'application/json'
         };
         
-        // Add auth token if user is logged in
-        if (user && user.token) {
-          headers.Authorization = `Bearer ${user.token}`;
+        // Add auth token if user is logged in - get from localStorage
+        const token = localStorage.getItem('authToken');
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+          console.log('🔑 Auth token added to request');
+        } else {
+          console.log('⚠️ No auth token found - isPurchased will not be checked');
         }
         
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/lessons`, {
+        const response = await fetch(`${window.location.origin}/api/lessons`, {
           headers
         });
         
@@ -153,15 +229,15 @@ function ExploreLessons() {
     }
     
     let lessonsData = lessons.filter(lesson => {
-      // Tìm kiếm theo tên
-      if (searchQuery && !lesson.title?.toLowerCase().includes(searchQuery.toLowerCase()) 
-          && !lesson.description?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
       // Lọc theo độ tuổi
       if (selectedAges.length > 0 && !selectedAges.includes(lesson.ageGroup)) return false;
       // Lọc theo trình độ
       if (selectedLevels.length > 0 && !selectedLevels.includes(lesson.level)) return false;
-      // Lọc theo kỹ năng
-      if (selectedSkills.length > 0 && !selectedSkills.some(skill => lesson.skills?.includes(skill))) return false;
+      // Lọc theo kỹ năng (category)
+      if (selectedSkills.length > 0 && !selectedSkills.includes(lesson.category)) return false;
+      // Lọc theo khoảng giá
+      const lessonPrice = lesson.price || 0;
+      if (lessonPrice < minPrice || lessonPrice > maxPrice) return false;
       return true;
     });
 
@@ -171,18 +247,20 @@ function ExploreLessons() {
         case 'popular':
           return (b.purchases || 0) - (a.purchases || 0);
         case 'price-low':
-          return (parseInt(a.price?.replace(/[^\d]/g, '') || '0')) - (parseInt(b.price?.replace(/[^\d]/g, '') || '0'));
+          return (a.price || 0) - (b.price || 0);
         case 'price-high':
-          return (parseInt(b.price?.replace(/[^\d]/g, '') || '0')) - (parseInt(a.price?.replace(/[^\d]/g, '') || '0'));
+          return (b.price || 0) - (a.price || 0);
         case 'rating':
           return (b.rating || 0) - (a.rating || 0);
-        default:
-          return (b.id || 0) - (a.id || 0); // newest
+        case 'duration':
+          return (a.duration || 0) - (b.duration || 0);
+        default: // newest
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
       }
     });
 
     return lessonsData;
-  }, [lessons, selectedAges, selectedLevels, selectedSkills, searchQuery, sortBy]);
+  }, [lessons, selectedAges, selectedLevels, selectedSkills, searchQuery, sortBy, minPrice, maxPrice]);
 
   // Xử lý tick filter
   const handleFilterChange = (type, value) => {
@@ -259,22 +337,6 @@ function ExploreLessons() {
               ))}
             </div>
           </div>
-
-          {/* Stats Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12 px-2">
-            <div className="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-6 text-center border border-white/20">
-              <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">{lessons.length}+</div>
-              <div className="text-gray-600 font-medium text-xs sm:text-sm">Bài học chất lượng</div>
-            </div>
-            <div className="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-6 text-center border border-white/20">
-              <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-2">500+</div>
-              <div className="text-gray-600 font-medium text-xs sm:text-sm">Lượt mua</div>
-            </div>
-            <div className="bg-white/60 backdrop-blur-lg rounded-2xl p-4 sm:p-6 text-center border border-white/20">
-              <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">4.8⭐</div>
-              <div className="text-gray-600 font-medium text-xs sm:text-sm">Đánh giá trung bình</div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -301,6 +363,7 @@ function ExploreLessons() {
                 <option value="price-low">Giá thấp đến cao</option>
                 <option value="price-high">Giá cao đến thấp</option>
                 <option value="rating">Đánh giá cao nhất</option>
+                <option value="duration">Thời lượng ngắn nhất</option>
               </select>
 
               {/* View Mode Toggle */}
@@ -342,13 +405,15 @@ function ExploreLessons() {
           <div id="mobile-filters" className="hidden lg:block mb-4 lg:mb-0">
           <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-4 sm:p-6 sticky top-24 border border-white/20 shadow-lg overflow-hidden">
             {/* Clear Filters Button */}
-            {(selectedAges.length > 0 || selectedLevels.length > 0 || selectedSkills.length > 0) && (
+            {(selectedAges.length > 0 || selectedLevels.length > 0 || selectedSkills.length > 0 || minPrice > 0 || maxPrice < 500000) && (
               <div className="mb-6 pb-6 border-b border-gray-100">
                 <button 
                   onClick={() => {
                     setSelectedAges([]);
                     setSelectedLevels([]);
                     setSelectedSkills([]);
+                    setMinPrice(0);
+                    setMaxPrice(500000);
                   }}
                   className="w-full px-4 py-2 bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-xl font-medium transition-all duration-200 flex items-center justify-center space-x-2"
                 >
@@ -401,28 +466,28 @@ function ExploreLessons() {
               </h3>
               <div className="space-y-3">
                 {levelOptions.map((level) => (
-                  <label className="group flex items-center cursor-pointer hover:bg-purple-50 p-2 rounded-xl transition-all duration-200" key={level}>
+                  <label className="group flex items-center cursor-pointer hover:bg-purple-50 p-2 rounded-xl transition-all duration-200" key={level.value}>
                     <input
                       type="checkbox"
                       className="hidden"
                       name="level"
-                      value={level}
-                      checked={selectedLevels.includes(level)}
-                      onChange={() => handleFilterChange('level', level)}
+                      value={level.value}
+                      checked={selectedLevels.includes(level.value)}
+                      onChange={() => handleFilterChange('level', level.value)}
                     />
                     <div className={`w-6 h-6 border-2 rounded-lg flex items-center justify-center mr-3 transition-all duration-300 ${
-                      selectedLevels.includes(level) 
+                      selectedLevels.includes(level.value) 
                         ? 'border-purple-500 bg-gradient-to-r from-purple-500 to-pink-600 shadow-lg transform scale-110' 
                         : 'border-gray-300 bg-white group-hover:border-purple-300 group-hover:shadow-sm'
                     }`}>
-                      <span className={`text-white text-sm font-bold ${selectedLevels.includes(level) ? 'animate-bounce' : 'hidden'}`}>
+                      <span className={`text-white text-sm font-bold ${selectedLevels.includes(level.value) ? 'animate-bounce' : 'hidden'}`}>
                         ✓
                       </span>
                     </div>
                     <span className={`font-medium transition-colors ${
-                      selectedLevels.includes(level) ? 'text-purple-600' : 'text-gray-700 group-hover:text-purple-600'
+                      selectedLevels.includes(level.value) ? 'text-purple-600' : 'text-gray-700 group-hover:text-purple-600'
                     }`}>
-                      {level}
+                      {level.label}
                     </span>
                   </label>
                 ))}
@@ -436,63 +501,84 @@ function ExploreLessons() {
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 {skillOptions.map((skill) => (
-                  <label className="group flex items-center cursor-pointer hover:bg-green-50 p-2 rounded-xl transition-all duration-200" key={skill}>
+                  <label className="group flex items-center cursor-pointer hover:bg-green-50 p-2 rounded-xl transition-all duration-200" key={skill.value}>
                     <input
                       type="checkbox"
                       className="hidden"
                       name="skill"
-                      value={skill}
-                      checked={selectedSkills.includes(skill)}
-                      onChange={() => handleFilterChange('skill', skill)}
+                      value={skill.value}
+                      checked={selectedSkills.includes(skill.value)}
+                      onChange={() => handleFilterChange('skill', skill.value)}
                     />
                     <div className={`w-5 h-5 border-2 rounded-lg flex items-center justify-center mr-2 transition-all duration-300 ${
-                      selectedSkills.includes(skill) 
+                      selectedSkills.includes(skill.value) 
                         ? 'border-green-500 bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg transform scale-110' 
                         : 'border-gray-300 bg-white group-hover:border-green-300 group-hover:shadow-sm'
                     }`}>
-                      <span className={`text-white text-xs font-bold ${selectedSkills.includes(skill) ? 'animate-bounce' : 'hidden'}`}>
+                      <span className={`text-white text-xs font-bold ${selectedSkills.includes(skill.value) ? 'animate-bounce' : 'hidden'}`}>
                         ✓
                       </span>
                     </div>
                     <span className={`text-sm font-medium transition-colors ${
-                      selectedSkills.includes(skill) ? 'text-green-600' : 'text-gray-700 group-hover:text-green-600'
+                      selectedSkills.includes(skill.value) ? 'text-green-600' : 'text-gray-700 group-hover:text-green-600'
                     }`}>
-                      {skill}
+                      {skill.label}
                     </span>
                   </label>
                 ))}
               </div>
             </div>
-            {/* Price filter với modern design */}
+            {/* Price filter với range slider */}
             <div>
               <h3 className="flex items-center space-x-2 font-bold text-gray-800 mb-4">
                 <span className="text-lg">💰</span>
                 <span>Khoảng giá</span>
               </h3>
               
-              {/* Price range buttons */}
-              <div className="space-y-2 mb-6">
-                {[
-                  { label: 'Miễn phí', min: 0, max: 0 },
-                  { label: 'Dưới 50k', min: 0, max: 50000 },
-                  { label: '50k - 100k', min: 50000, max: 100000 },
-                  { label: 'Trên 100k', min: 100000, max: 500000 }
-                ].map((range, index) => (
-                  <button
-                    key={index}
-                    className="w-full text-left px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-orange-50 hover:to-orange-100 border border-gray-200 hover:border-orange-300 rounded-xl text-sm font-medium text-gray-700 hover:text-orange-600 transition-all duration-200 group"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span>{range.label}</span>
-                      <span className="text-xs text-gray-400 group-hover:text-orange-400">
-                        {lessons.filter(l => {
-                          const price = parseInt(l.price?.replace(/[^\d]/g, '') || '0');
-                          return range.max === 0 ? price === 0 : price >= range.min && price <= range.max;
-                        }).length} bài học
-                      </span>
-                    </div>
-                  </button>
-                ))}
+              {/* Price Range Slider */}
+              <div className="space-y-4 mb-6">
+                {/* Min Price Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Giá từ: <span className="text-blue-600 font-bold">{minPrice.toLocaleString('vi-VN')}đ</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="500000"
+                    step="10000"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(minPrice / 500000) * 100}%, #e5e7eb ${(minPrice / 500000) * 100}%, #e5e7eb 100%)`
+                    }}
+                  />
+                </div>
+                
+                {/* Max Price Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Giá đến: <span className="text-blue-600 font-bold">{maxPrice.toLocaleString('vi-VN')}đ</span>
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="500000"
+                    step="10000"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(Number(e.target.value))}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                    style={{
+                      background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(maxPrice / 500000) * 100}%, #e5e7eb ${(maxPrice / 500000) * 100}%, #e5e7eb 100%)`
+                    }}
+                  />
+                </div>
+                
+                {/* Price Range Display */}
+                <div className="text-center text-sm text-gray-600 bg-gray-50 rounded-lg py-2">
+                  Khoảng giá: {minPrice.toLocaleString('vi-VN')}đ - {maxPrice.toLocaleString('vi-VN')}đ
+                </div>
               </div>
 
               {/* Apply Filter Button */}

@@ -317,6 +317,17 @@ router.post('/',
 router.post('/enroll', authenticateToken, enrollLesson);
 
 /**
+ * @route   POST /api/lessons/:id/enroll
+ * @desc    Đăng ký học bài học (URL param version)
+ * @access  Private/Student
+ */
+router.post('/:id/enroll', authenticateToken, async (req, res) => {
+  // Convert URL param to body format for enrollLesson controller
+  req.body.lessonId = req.params.id;
+  return enrollLesson(req, res);
+});
+
+/**
  * @route   GET /api/lessons/:id/progress
  * @desc    Lấy tiến độ học của user cho bài học
  * @access  Private/Student

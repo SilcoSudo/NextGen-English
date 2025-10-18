@@ -25,7 +25,15 @@ function MyLessons() {
       duration: lesson.video?.duration || lesson.duration || 0,
       
       // Safe thumbnail handling  
-      thumbnail: lesson.thumbnail || lesson.video?.thumbnail || 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=250&fit=crop&auto=format&q=80',
+      thumbnail: (() => {
+        const thumb = lesson.thumbnail || lesson.video?.thumbnail || 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&h=250&fit=crop&auto=format&q=80';
+        // Convert localhost URLs to relative API endpoints
+        if (thumb.includes('localhost:5000')) {
+          const filename = thumb.split('/').pop();
+          return `${window.location.origin}/api/images/${filename}`;
+        }
+        return thumb;
+      })(),
       
       // Teacher info
       teacherName: (() => {
@@ -71,9 +79,9 @@ function MyLessons() {
           return;
         }
         
-        console.log('Making request to:', `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/lessons/my-lessons`);
+        console.log('Making request to:', `${window.location.origin}/api/lessons/my-lessons`);
         
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/lessons/my-lessons`, {
+        const response = await fetch(`${window.location.origin}/api/lessons/my-lessons`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
