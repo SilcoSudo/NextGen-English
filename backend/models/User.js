@@ -54,8 +54,12 @@ const userSchema = new mongoose.Schema({
       validator: function(v) {
         // Allow empty/null values
         if (!v) return true;
-        // Validate format if provided
-        return /^(\+84|84|0)[3|5|7|8|9][0-9]{8}$/.test(v);
+        // Only validate if phone field is being modified
+        if (!this.isModified('phone')) return true;
+        // Remove all non-digit characters for validation
+        const cleanPhone = v.replace(/\D/g, '');
+        // Accept any non-empty string for now to avoid login issues
+        return cleanPhone.length >= 7 && cleanPhone.length <= 15;
       },
       message: 'Số điện thoại không đúng định dạng'
     }

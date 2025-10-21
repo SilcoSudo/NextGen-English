@@ -260,7 +260,7 @@ function UserProfile() {
   console.log('Profile data state:', profileData);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 ">
       <Header /> {/* Replace Navbar with Header */}
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Header */}

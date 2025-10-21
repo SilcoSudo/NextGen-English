@@ -204,16 +204,7 @@ const TeacherDashboard = () => {
                 title="Cài đặt"
               >
                 <div className="text-xl">⚙️</div>
-              </button>
-
-              <button
-                onClick={() => setShowHelp(true)}
-                className="p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                title="Trợ giúp"
-              >
-                <div className="text-xl">🆘</div>
-              </button>
-              
+              </button>              
               <div className="text-right">
                 <p className="text-sm text-gray-500">Vai trò</p>
                 <p className="font-medium text-blue-600 capitalize">{user?.role}</p>

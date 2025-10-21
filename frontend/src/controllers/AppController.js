@@ -98,7 +98,6 @@ function App() {
           {/* User Profile Route */}
           <Route path="/profile" element={
             <ProtectedRoute>
-              <Header />
               <UserProfile />
             </ProtectedRoute>
           } />
