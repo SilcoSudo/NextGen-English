@@ -126,14 +126,27 @@ const seedCustomerExperienceAccounts = async () => {
     await database.connect();
     console.log('Connected to database');
 
-    // Insert customer experience accounts
-    await User.insertMany(customerExperienceAccounts);
-    console.log('Customer experience accounts seeded successfully');
+    // Delete existing customer accounts first
+    const deleteResult = await User.deleteMany({
+      username: { $in: ['customer1', 'customer2', 'customer3', 'customer4', 'customer5', 'customer6', 'customer7'] }
+    });
+    console.log(`Deleted ${deleteResult.deletedCount} existing customer accounts`);
+
+    // Insert customer experience accounts one by one to trigger pre-save hook for password hashing
+    console.log('Creating customer accounts with hashed passwords...');
+    for (const accountData of customerExperienceAccounts) {
+      const user = new User(accountData);
+      await user.save(); // This will trigger the pre-save middleware to hash password
+      console.log(`  ✓ Created ${user.username}`);
+    }
+    
+    console.log(`\n✅ Successfully created ${customerExperienceAccounts.length} customer accounts`);
 
     await database.disconnect();
     console.log('Disconnected from database');
   } catch (error) {
     console.error('Error seeding customer experience accounts:', error);
+    process.exit(1);
   }
 };
 
