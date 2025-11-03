@@ -11,7 +11,7 @@ const customerExperienceAccounts = [
     username: 'customer1',
     email: 'customer1@nextgen.com',
     password: 'customer123', // Note: Password for Customer 1
-    role: 'customer',
+    role: 'student',
     avatar: 'icon:{"iconName":"FaSmile","color":"#FF5733","name":"Customer"}',
     isActive: true,
     emailVerified: true,
@@ -27,7 +27,7 @@ const customerExperienceAccounts = [
     username: 'customer2',
     email: 'customer2@nextgen.com',
     password: 'customer123', // Note: Password for Customer 2
-    role: 'customer',
+    role: 'student',
     avatar: 'icon:{"iconName":"FaSmile","color":"#4CAF50","name":"Customer"}',
     isActive: true,
     emailVerified: true,
@@ -43,7 +43,7 @@ const customerExperienceAccounts = [
     username: 'customer3',
     email: 'customer3@nextgen.com',
     password: 'customer123', // Note: Password for Customer 3
-    role: 'customer',
+    role: 'student',
     avatar: 'icon:{"iconName":"FaSmile","color":"#2196F3","name":"Customer"}',
     isActive: true,
     emailVerified: true,
@@ -59,7 +59,7 @@ const customerExperienceAccounts = [
     username: 'customer4',
     email: 'customer4@nextgen.com',
     password: 'customer123', // Note: Password for Customer 4
-    role: 'customer',
+    role: 'student',
     avatar: 'icon:{"iconName":"FaSmile","color":"#FFC107","name":"Customer"}',
     isActive: true,
     emailVerified: true,
@@ -75,7 +75,7 @@ const customerExperienceAccounts = [
     username: 'customer5',
     email: 'customer5@nextgen.com',
     password: 'customer123', // Note: Password for Customer 5
-    role: 'customer',
+    role: 'student',
     avatar: 'icon:{"iconName":"FaSmile","color":"#9C27B0","name":"Customer"}',
     isActive: true,
     emailVerified: true,
@@ -91,7 +91,7 @@ const customerExperienceAccounts = [
     username: 'customer6',
     email: 'customer6@nextgen.com',
     password: 'customer123', // Note: Password for Customer 6
-    role: 'customer',
+    role: 'student',
     avatar: 'icon:{"iconName":"FaSmile","color":"#E91E63","name":"Customer"}',
     isActive: true,
     emailVerified: true,
@@ -107,7 +107,7 @@ const customerExperienceAccounts = [
     username: 'customer7',
     email: 'customer7@nextgen.com',
     password: 'customer123', // Note: Password for Customer 7
-    role: 'customer',
+    role: 'student',
     avatar: 'icon:{"iconName":"FaSmile","color":"#FF9800","name":"Customer"}',
     isActive: true,
     emailVerified: true,
