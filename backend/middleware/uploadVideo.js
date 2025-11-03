@@ -50,6 +50,7 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   // Kiểm tra MIME type
   const allowedMimeTypes = [
+    // Standard video formats
     'video/mp4',
     'video/mpeg',
     'video/quicktime', // .mov
@@ -57,6 +58,7 @@ const fileFilter = (req, file, cb) => {
     'video/webm',
     'video/ogg',
     'video/3gpp', // .3gp
+    'video/3gpp2', // .3g2
     'video/x-ms-wmv', // .wmv
     'video/x-matroska', // .mkv
     'video/x-flv', // .flv
@@ -64,14 +66,45 @@ const fileFilter = (req, file, cb) => {
     'video/x-m4v', // .m4v
     'video/vnd.dlna.mpeg-tts', // .m2ts
     'video/MP2T', // .ts
-    'video/x-msvideo', // .avi (duplicate but safe)
-    'video/quicktime', // .mov (duplicate but safe)
+    'video/mts', // .mts
+    'video/vob', // .vob
+    // Additional formats
+    'video/divx', // .divx
+    'video/xvid', // .xvid
+    'video/h264', // .h264
+    'video/h265', // .h265
+    'video/x-ms-vob', // .vob
+    'video/x-f4v', // .f4v
+    'video/mp2p', // .vob, .mpg
+    'video/mp2t', // .ts, .m2ts
+    'video/vnd.rn-realvideo', // .rm, .rmvb
+    'video/x-mng', // .mng
+    'video/x-theora+ogg', // .ogv
+    'video/x-ms-wmx', // .wmx
+    'video/x-ms-wvx', // .wvx
+    'video/avi', // .avi
+    'application/vnd.rn-realmedia', // .rm
+    'application/vnd.rn-realmedia-vbr', // .rmvb
   ];
 
   // Kiểm tra extension file nếu MIME type không rõ ràng
   const allowedExtensions = [
-    '.mp4', '.avi', '.mov', '.webm', '.ogg', '.3gp', '.wmv',
-    '.mkv', '.flv', '.asf', '.m4v', '.m2ts', '.ts', '.mpg', '.mpeg'
+    // Common formats
+    '.mp4', '.avi', '.mov', '.webm', '.ogg', '.ogv', '.3gp', '.3g2',
+    // Windows formats
+    '.wmv', '.asf', '.wmx', '.wvx',
+    // High quality formats
+    '.mkv', '.m4v', '.flv', '.f4v',
+    // MPEG formats
+    '.mpg', '.mpeg', '.mpe', '.m2v', '.m4p', '.m2ts', '.mts', '.ts',
+    // DVD/VOB formats
+    '.vob',
+    // Codec-specific
+    '.divx', '.xvid', '.h264', '.h265', '.hevc',
+    // RealMedia
+    '.rm', '.rmvb',
+    // Other
+    '.mng', '.dv', '.dat', '.nsv'
   ];
 
   const fileExt = path.extname(file.originalname).toLowerCase();
@@ -80,7 +113,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(fileExt)) {
     cb(null, true);
   } else {
-    const error = new Error(`Chỉ chấp nhận file video. Định dạng được hỗ trợ: MP4, AVI, MOV, WebM, OGG, 3GP, WMV, MKV, FLV, ASF, M4V, M2TS, TS, MPG, MPEG. File của bạn: ${file.originalname} (${file.mimetype})`);
+    const error = new Error(`Chỉ chấp nhận file video. Định dạng được hỗ trợ: MP4, AVI, MOV, WebM, MKV, FLV, WMV, MPG, MPEG, M4V, M2TS, TS, VOB, 3GP, 3G2, OGV, F4V, DIVX, XVID, H264, H265, RM, RMVB, DV, DAT và nhiều định dạng khác. File của bạn: ${file.originalname} (${file.mimetype})`);
     error.code = 'INVALID_FILE_TYPE';
     cb(error, false);
   }
