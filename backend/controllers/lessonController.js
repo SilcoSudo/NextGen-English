@@ -908,7 +908,13 @@ const updateLessonProgress = async (req, res) => {
     }
 
     // Kiểm tra payment status (nếu bài học không miễn phí)
-    if (lesson.price > 0 && !progress.paymentInfo.paid) {
+    // Allow if: lesson is free (price = 0), OR payment is completed, OR admin unlocked (status = 'free')
+    const hasAccess = lesson.price === 0 || 
+                     progress.paymentInfo.paid || 
+                     progress.paymentInfo.status === 'free' ||
+                     progress.paymentInfo.status === 'completed';
+    
+    if (lesson.price > 0 && !hasAccess) {
       return res.status(403).json({
         success: false,
         message: 'Bạn cần thanh toán để xem bài học này'
