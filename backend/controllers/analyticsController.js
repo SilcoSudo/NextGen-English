@@ -83,7 +83,7 @@ const getTeacherAnalytics = async (req, res) => {
     }
     
     // Lấy tất cả progress của các lessons này
-    const progresses = await LessonProgress.find({ 
+    const progresses = await Progress.find({ 
       lessonId: { $in: lessonIds } 
     }).populate('userId', 'name email createdAt')
       .populate('lessonId', 'title price');
@@ -103,16 +103,16 @@ const getTeacherAnalytics = async (req, res) => {
     
     // Lesson performance
     const lessonPerformance = teacherLessons.map(lesson => {
-      const lessonProgresses = progresses.filter(p => p.lessonId._id.toString() === lesson._id.toString());
-      const completedCount = lessonProgresses.filter(p => p.status === 'completed').length;
+      const Progresses = progresses.filter(p => p.lessonId._id.toString() === lesson._id.toString());
+      const completedCount = Progresses.filter(p => p.status === 'completed').length;
       
       return {
         id: lesson._id,
         title: lesson.title,
-        totalPurchases: lessonProgresses.length,
+        totalPurchases: Progresses.length,
         completedCount,
-        completionRate: lessonProgresses.length > 0 ? Math.round((completedCount / lessonProgresses.length) * 100) : 0,
-        revenue: lessonProgresses.reduce((sum, p) => sum + (p.paymentInfo.amount || 0), 0),
+        completionRate: Progresses.length > 0 ? Math.round((completedCount / Progresses.length) * 100) : 0,
+        revenue: Progresses.reduce((sum, p) => sum + (p.paymentInfo.amount || 0), 0),
         averageRating: lesson.stats.averageRating || 0,
         views: lesson.stats.totalViews || 0,
         price: lesson.price
@@ -158,11 +158,11 @@ const getAdminAnalytics = async (req, res) => {
     const [totalUsers, totalLessons, totalProgresses] = await Promise.all([
       User.countDocuments({ isActive: true }),
       Lesson.countDocuments(),
-      LessonProgress.countDocuments()
+      Progress.countDocuments()
     ]);
     
     const publishedLessons = await Lesson.countDocuments({ status: 'published' });
-    const totalRevenue = await LessonProgress.aggregate([
+    const totalRevenue = await Progress.aggregate([
       { $group: { _id: null, total: { $sum: '$paymentInfo.amount' } } }
     ]);
     
@@ -199,7 +199,7 @@ const getAdminAnalytics = async (req, res) => {
       .select('title stats price createdBy');
     
     // Recent activities
-    const recentActivities = await LessonProgress.find()
+    const recentActivities = await Progress.find()
       .sort({ enrolledAt: -1 })
       .limit(20)
       .populate('userId', 'name email')
@@ -258,7 +258,7 @@ const getStudentAnalytics = async (req, res) => {
     }
     
     // Lấy tất cả progress của user
-    const progresses = await LessonProgress.find({ userId: studentId })
+    const progresses = await Progress.find({ userId: studentId })
       .populate('lessonId', 'title category level duration price')
       .sort({ enrolledAt: -1 });
     
@@ -338,7 +338,7 @@ const generateRevenueChart = async (lessonIds, days) => {
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
   
-  const revenueData = await LessonProgress.aggregate([
+  const revenueData = await Progress.aggregate([
     {
       $match: {
         lessonId: { $in: lessonIds },
@@ -375,7 +375,7 @@ const generateMonthlyRevenue = async (months) => {
   const startDate = new Date();
   startDate.setMonth(startDate.getMonth() - months);
   
-  const monthlyData = await LessonProgress.aggregate([
+  const monthlyData = await Progress.aggregate([
     {
       $match: {
         'paymentInfo.paidAt': {
