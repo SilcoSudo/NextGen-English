@@ -41,8 +41,8 @@ const VideoPlayer = ({ videoUrl, title, className = '' }) => {
       };
     }
 
-    // Direct video file (mp4, webm, etc.)
-    const videoExtensions = /\.(mp4|webm|ogg|mov|avi)(\?.*)?$/i;
+    // Direct video file (mp4, webm, mkv, avi, mov, flv, wmv, etc.)
+    const videoExtensions = /\.(mp4|webm|ogg|ogv|mov|avi|mkv|flv|wmv|m4v|mpg|mpeg|m2v|3gp|3g2|mts|m2ts|ts|vob|asf|wmx|wvx|f4v|divx|xvid|h264|h265|hevc|rm|rmvb|dv|dat|mng)(\?.*)?$/i;
     if (videoExtensions.test(url)) {
       return {
         platform: 'direct',
@@ -94,7 +94,7 @@ const VideoPlayer = ({ videoUrl, title, className = '' }) => {
           <div className="text-4xl mb-3">⚠️</div>
           <p className="font-medium mb-2">URL video không hợp lệ</p>
           <p className="text-sm">
-            Hỗ trợ YouTube, Vimeo hoặc file video trực tiếp (mp4, webm, ogg)
+            Hỗ trợ YouTube, Vimeo hoặc file video (MP4, AVI, MOV, WebM, MKV, FLV, WMV, MPG, MPEG, M4V, M2TS, VOB, 3GP, OGV, F4V, DIVX, XVID, H264, H265, RM, RMVB và nhiều định dạng khác)
           </p>
           <p className="text-xs mt-2 text-gray-600 break-all">
             URL hiện tại: {videoUrl}
@@ -152,7 +152,11 @@ const VideoPlayer = ({ videoUrl, title, className = '' }) => {
           <source src={videoInfo.embedUrl} type="video/ogg" />
           <source src={videoInfo.embedUrl} type="video/quicktime" />
           <source src={videoInfo.embedUrl} type="video/x-msvideo" />
-          <source src={videoInfo.embedUrl} type="video/ogg" />
+          <source src={videoInfo.embedUrl} type="video/x-matroska" />
+          <source src={videoInfo.embedUrl} type="video/x-flv" />
+          <source src={videoInfo.embedUrl} type="video/x-ms-wmv" />
+          <source src={videoInfo.embedUrl} type="video/mpeg" />
+          <source src={videoInfo.embedUrl} type="video/3gpp" />
           Trình duyệt của bạn không hỗ trợ phát video HTML5.
         </video>
       ) : null}

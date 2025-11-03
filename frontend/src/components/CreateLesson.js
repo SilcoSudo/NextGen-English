@@ -80,9 +80,35 @@ const CreateLesson = ({ onLessonCreated, onCancel }) => {
   const handleVideoFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const allowedTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/webm', 'video/ogg'];
-      if (!allowedTypes.includes(file.type)) {
-        setError('Chỉ hỗ trợ file video định dạng MP4, AVI, MOV, WebM, OGG');
+      // Expanded list of supported video MIME types
+      const allowedTypes = [
+        // Common formats
+        'video/mp4', 'video/avi', 'video/mov', 'video/webm', 'video/ogg', 'video/ogv',
+        // Mobile & streaming
+        'video/3gpp', 'video/3gpp2',
+        // Windows formats
+        'video/x-ms-wmv', 'video/x-ms-asf', 'video/x-ms-wmx', 'video/x-ms-wvx',
+        // High quality
+        'video/x-matroska', 'video/x-flv', 'video/x-m4v', 'video/x-f4v',
+        // MPEG family
+        'video/mpeg', 'video/mpg', 'video/mpe', 'video/m2v', 'video/mp2t', 'video/vnd.dlna.mpeg-tts',
+        'video/MP2T', 'video/mts', 'video/m2ts', 'video/ts',
+        // Other
+        'video/quicktime', 'video/x-msvideo', 'video/vob', 'video/divx', 'video/xvid',
+        'video/h264', 'video/h265', 'video/vnd.rn-realvideo', 'application/vnd.rn-realmedia',
+        'application/vnd.rn-realmedia-vbr'
+      ];
+      
+      // Also check file extension as fallback
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      const allowedExtensions = [
+        'mp4', 'avi', 'mov', 'webm', 'ogg', 'ogv', '3gp', '3g2', 'wmv', 'asf', 'wmx', 'wvx',
+        'mkv', 'm4v', 'flv', 'f4v', 'mpg', 'mpeg', 'mpe', 'm2v', 'm4p', 'm2ts', 'mts', 'ts',
+        'vob', 'divx', 'xvid', 'h264', 'h265', 'hevc', 'rm', 'rmvb', 'dv', 'dat', 'mng'
+      ];
+      
+      if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExt)) {
+        setError('Chỉ hỗ trợ file video. Định dạng được hỗ trợ: MP4, AVI, MOV, WebM, MKV, FLV, WMV, MPG, MPEG, M4V, M2TS, TS, VOB, 3GP, 3G2, OGV, F4V, DIVX, XVID, H264, H265, RM, RMVB, DV, DAT và nhiều định dạng khác (tối đa 500MB)');
         return;
       }
       
@@ -374,7 +400,7 @@ const CreateLesson = ({ onLessonCreated, onCancel }) => {
                     Kéo thả file vào đây hoặc click để chọn
                   </p>
                   <p className="text-xs text-gray-400">
-                    Hỗ trợ: MP4, AVI, MOV, WebM, OGG, 3GP, WMV, MKV, FLV, M4V, TS, MPG (tối đa 500MB)
+                    Hỗ trợ 40+ định dạng: MP4, AVI, MOV, WebM, MKV, FLV, WMV, MPG, MPEG, M4V, M2TS, TS, VOB, 3GP, 3G2, OGV, F4V, DIVX, XVID, H264, H265, RM, RMVB và nhiều định dạng khác (tối đa 500MB)
                   </p>
                 </label>
               </div>
