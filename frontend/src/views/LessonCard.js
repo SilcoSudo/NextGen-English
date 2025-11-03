@@ -173,37 +173,6 @@ function LessonCard({ lesson }) {
     if (e.target.name === "purchase" || e.target.closest('[name="purchase"]')) {
       e.stopPropagation();
       
-      // Check if lesson is free (price === 0)
-      const isFreeLesson = (() => {
-        const originalPriceNum = Number(lesson.originalPrice);
-        const priceStr = String(lesson.price).toLowerCase();
-        const originalPriceStr = String(lesson.originalPrice).toLowerCase();
-        
-        const check1 = originalPriceNum === 0;
-        const check2 = priceStr === 'free';
-        const check3 = originalPriceStr === 'free';
-        const check4 = priceStr === '0';
-        
-        console.log('🔍 Detailed free lesson check:', {
-          originalPrice: lesson.originalPrice,
-          originalPriceNum,
-          price: lesson.price,
-          priceStr,
-          originalPriceStr,
-          check1: `originalPriceNum === 0: ${check1}`,
-          check2: `priceStr === 'free': ${check2}`,
-          check3: `originalPriceStr === 'free': ${check3}`,
-          check4: `priceStr === '0': ${check4}`,
-          result: check1 || check2 || check3 || check4
-        });
-        
-        return check1 || check2 || check3 || check4;
-      })();
-      console.log('🔍 Free lesson check:', {
-        originalPrice: lesson.originalPrice,
-        price: lesson.price,
-        isFreeLesson
-      });
       console.log('🛒 Purchase button clicked:', {
         lessonId,
         title: lesson.title,
@@ -287,12 +256,27 @@ function LessonCard({ lesson }) {
   // Check if lesson is purchased from backend data
   const isPurchased = lesson.isPurchased === true;
   
+  // Check if lesson is free (price === 0) - reusable function
+  const isFreeLesson = (() => {
+    const originalPriceNum = Number(lesson.originalPrice);
+    const priceStr = String(lesson.price).toLowerCase();
+    const originalPriceStr = String(lesson.originalPrice).toLowerCase();
+    
+    const check1 = originalPriceNum === 0;
+    const check2 = priceStr === 'free';
+    const check3 = originalPriceStr === 'free';
+    const check4 = priceStr === '0';
+    
+    return check1 || check2 || check3 || check4;
+  })();
+  
   console.log('🎬 LessonCard Debug:', {
     lessonId: lesson._id || lesson.id,
     title: lesson.title,
     originalPrice: lesson.originalPrice,
     price: lesson.price,
     isPurchased: isPurchased,
+    isFreeLesson: isFreeLesson,
     thumbnail: lesson.thumbnail,
     videoUrl: lesson.videoUrl
   });
@@ -511,8 +495,10 @@ function LessonCard({ lesson }) {
                   </span>
                 ) : (
                   <span className="flex items-center space-x-2">
-                    <span>Mua ngay</span>
-                    <span className="transform group-hover/btn:translate-x-1 transition-transform">🛒</span>
+                    <span>{isFreeLesson ? 'Đăng ký miễn phí' : 'Mua ngay'}</span>
+                    <span className="transform group-hover/btn:translate-x-1 transition-transform">
+                      {isFreeLesson ? '✨' : '🛒'}
+                    </span>
                   </span>
                 )}
               </button>
