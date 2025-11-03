@@ -1,3 +1,7 @@
+const User = require('../models/User');
+const Lesson = require('../models/Lesson');
+const Progress = require('../models/Progress');
+
 // GET /api/analytics/streak - Get current user's learning streak
 const getUserStreak = async (req, res) => {
   try {
