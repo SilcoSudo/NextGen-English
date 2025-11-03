@@ -14,7 +14,9 @@ class Database {
         maxIdleTimeMS: 30000,
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
-        family: 4 // Use IPv4, skip trying IPv6
+        family: 4, // Use IPv4, skip trying IPv6
+        retryWrites: true,
+        retryReads: true,
       };
 
       // Connect to MongoDB
