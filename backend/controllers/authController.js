@@ -18,8 +18,11 @@ const login = async (req, res) => {
     // Kiểm tra validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      // Extract first error message for user-friendly display
+      const firstError = errors.array()[0];
       return res.status(400).json({
         error: 'Dữ liệu không hợp lệ',
+        message: firstError.msg,
         details: errors.array()
       });
     }
@@ -83,8 +86,11 @@ const register = async (req, res) => {
     // Kiểm tra validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      // Extract first error message for user-friendly display
+      const firstError = errors.array()[0];
       return res.status(400).json({
         error: 'Dữ liệu không hợp lệ',
+        message: firstError.msg,
         details: errors.array()
       });
     }
