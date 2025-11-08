@@ -56,6 +56,8 @@ const corsOptions = {
           'http://localhost:3000',
           'http://127.0.0.1:3000',
           'http://localhost:3001',
+          'http://nextgenenglish.id.vn',
+          'http://www.nextgenenglish.id.vn',
           'https://nextgenenglish.id.vn',
           'https://www.nextgenenglish.id.vn',
           'https://api.nextgenenglish.id.vn'
