@@ -29,19 +29,19 @@ app.use(helmet({
   contentSecurityPolicy: false,
 }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
-  message: {
-    error: 'Quá nhiều yêu cầu từ IP này, vui lòng thử lại sau.',
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  // Skip rate limiting for trusted proxies in production
-  skip: (req, res) => process.env.NODE_ENV === 'production' && req.ip === req.connection.remoteAddress
-});
-app.use(limiter);
+// Rate limiting - DISABLED
+// const limiter = rateLimit({
+//   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+//   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
+//   message: {
+//     error: 'Quá nhiều yêu cầu từ IP này, vui lòng thử lại sau.',
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+//   // Skip rate limiting for trusted proxies in production
+//   skip: (req, res) => process.env.NODE_ENV === 'production' && req.ip === req.connection.remoteAddress
+// });
+// app.use(limiter);
 
 // CORS configuration
 const corsOptions = {
