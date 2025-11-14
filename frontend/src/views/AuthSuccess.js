@@ -16,14 +16,18 @@ function AuthSuccess() {
           throw new Error('No token provided');
         }
 
-        console.log('✅ Auth success - Token received');
+        console.log('✅ Auth success - Token received:', token.substring(0, 20) + '...');
+
+        // Use API URL from environment or construct from backend
+        const apiUrl = process.env.REACT_APP_API_URL || `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/api`;
 
         // Fetch user info từ backend
         const response = await fetch(
-          `${window.location.origin}/api/auth/me`,
+          `${apiUrl}/auth/me`,
           {
             headers: {
-              'Authorization': `Bearer ${token}`
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
             }
           }
         );
