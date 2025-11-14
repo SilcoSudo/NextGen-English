@@ -20,7 +20,8 @@ function VerifyEmail() {
       }
 
       try {
-        const response = await fetch(`${window.location.origin}/api/auth/verify-email`, {
+        const apiUrl = process.env.REACT_APP_API_URL || `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/api`;
+        const response = await fetch(`${apiUrl}/auth/verify-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

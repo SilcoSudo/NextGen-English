@@ -55,7 +55,8 @@ function ResetPassword() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${window.location.origin}/api/auth/reset-password`, {
+      const apiUrl = process.env.REACT_APP_API_URL || `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/api`;
+      const response = await fetch(`${apiUrl}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
