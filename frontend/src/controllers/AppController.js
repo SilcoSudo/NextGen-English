@@ -16,6 +16,7 @@ import PaymentFailure from "../views/PaymentFailure";
 import UserProfile from "../views/UserProfile";
 import LoginPage from "../views/LoginPage";
 import RegisterPage from "../views/RegisterPage";
+import AuthSuccess from "../views/AuthSuccess";
 import ForgotPassword from "../views/ForgotPassword";
 import VerifyEmail from "../views/VerifyEmail";
 import ResetPassword from "../views/ResetPassword";
@@ -48,6 +49,7 @@ function App() {
           } />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/auth-success" element={<AuthSuccess />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />

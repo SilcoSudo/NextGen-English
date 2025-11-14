@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../models/AuthContext';
+import { useGoogleLogin as useGoogleLoginHook } from '../models/useGoogleLogin';
 
 function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +21,7 @@ function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState(0);
+  const { handleGoogleLogin, handleGoogleError } = useGoogleLoginHook();
   const navigate = useNavigate();
   const { register } = useAuth();
 
@@ -427,15 +430,14 @@ function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Social Register Buttons */}
-                <div className="grid grid-cols gap-4">
-                  <button
-                    type="button"
-                    className="group bg-white border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700 py-4 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-105 hover:shadow-lg"
-                  >
-                    <i className="ri-google-fill text-red-500 text-xl group-hover:scale-110 transition-transform duration-300"></i>
-                    <span className="ml-2 hidden sm:inline">Google</span>
-                  </button>
+                {/* Google Register Button */}
+                <div className="w-full flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleLogin}
+                    onError={handleGoogleError}
+                    width="100%"
+                    locale="vi_VN"
+                  />
                 </div>
               </form>
 

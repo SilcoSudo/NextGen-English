@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../models/AuthContext';
+import { useGoogleLogin as useGoogleLoginHook } from '../models/useGoogleLogin';
 
 function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +15,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const { handleGoogleLogin, handleGoogleError } = useGoogleLoginHook();
 
   // Lấy trang đích từ state (nếu có)
   const from = location.state?.from?.pathname || '/dashboard';
@@ -245,13 +248,14 @@ function LoginPage() {
                 </div>
 
                 {/* Google Login Button */}
-                <button
-                  type="button"
-                  className="group w-full bg-white border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 text-gray-700 py-4 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center cursor-pointer hover:scale-105 hover:shadow-lg"
-                >
-                  <i className="ri-google-fill text-red-500 mr-3 text-xl group-hover:scale-110 transition-transform"></i>
-                  <span>Đăng nhập với Google</span>
-                </button>
+                <div className="w-full flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleLogin}
+                    onError={handleGoogleError}
+                    width="100%"
+                    locale="vi_VN"
+                  />
+                </div>
               </form>
 
               {/* Sign Up Link */}

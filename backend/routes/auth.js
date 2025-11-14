@@ -1,7 +1,8 @@
 const express = require('express');
 const { body } = require('express-validator');
+const passport = require('passport');
 const authController = require('../controllers/authController');
-const { authenticateToken, requireAdmin } = require('../middleware/auth');
+const { authenticateToken, requireAdmin, generateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -137,6 +138,44 @@ router.post('/forgot-password', authController.forgotPassword);
  * @access  Public
  */
 router.post('/reset-password', authController.resetPassword);
+
+// Google OAuth Routes
+/**
+ * @route   GET /api/auth/google
+ * @desc    Redirect to Google login
+ * @access  Public
+ */
+router.get('/google', passport.authenticate('google', { 
+  scope: ['profile', 'email'] 
+}));
+
+/**
+ * @route   GET /api/auth/google/callback
+ * @desc    Google OAuth callback
+ * @access  Public
+ */
+router.get('/google/callback', 
+  passport.authenticate('google', { 
+    failureRedirect: process.env.FRONTEND_URL + '/login?error=oauth_failed',
+    session: false
+  }),
+  (req, res) => {
+    try {
+      // Generate JWT token
+      const token = generateToken(req.user._id);
+      const user = req.user.toJSON();
+      
+      console.log('✅ Google OAuth successful:', user.email);
+      
+      // Redirect to frontend with token in query params
+      const redirectUrl = `${process.env.FRONTEND_URL}/auth-success?token=${token}`;
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error('❌ Google OAuth callback error:', error);
+      res.redirect(`${process.env.FRONTEND_URL}/login?error=server_error`);
+    }
+  }
+);
 
 // ADMIN ROUTES - Quản lý người dùng (chỉ admin)
 

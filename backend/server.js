@@ -4,6 +4,8 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
+const session = require('express-session');
+const passport = require('./config/passport');
 require('dotenv').config();
 
 // Import database connection
@@ -80,6 +82,22 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Session middleware for Passport
+app.use(session({
+  secret: process.env.JWT_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax'
+  }
+}));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Request logging middleware
 app.use((req, res, next) => {
