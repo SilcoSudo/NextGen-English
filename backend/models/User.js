@@ -11,8 +11,12 @@ const userSchema = new mongoose.Schema({
   },
   username: {
     type: String,
-    required: [true, 'Tên đăng nhập không được để trống'],
+    required: function() {
+      // Username is required only if user is not using Google OAuth
+      return !this.googleId;
+    },
     unique: true,
+    sparse: true,
     trim: true,
     lowercase: true,
     minlength: [3, 'Tên đăng nhập phải có ít nhất 3 ký tự'],
@@ -32,7 +36,10 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Mật khẩu không được để trống'],
+    required: function() {
+      // Password is required only if user is not using Google OAuth
+      return !this.googleId;
+    },
     minlength: [6, 'Mật khẩu phải có ít nhất 6 ký tự']
   },
   googleId: {
