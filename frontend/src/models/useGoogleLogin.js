@@ -1,55 +1,45 @@
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
 
+/**
+ * Hook to handle Google OAuth login
+ * The OAuth flow is handled automatically by GoogleLogin component
+ * This hook is kept for reference/custom implementations
+ */
 export const useGoogleLogin = () => {
-  const navigate = useNavigate();
-  const { login: authLogin } = useAuth();
 
-  const handleGoogleLogin = useCallback(async (credentialResponse) => {
+  /**
+   * Handle when GoogleLogin component successfully authenticates
+   * The actual OAuth is handled by Google, we just store the result
+   */
+  const handleGoogleLoginSuccess = useCallback((credentialResponse) => {
     try {
-      const { credential } = credentialResponse;
+      console.log('🔐 Google login response received');
+      console.log('credential:', credentialResponse?.credential ? 'present' : 'missing');
 
-      console.log('🔐 Google credential received');
-
-      // Send token to backend
-      const response = await fetch(
-        `${window.location.origin}/api/auth/google/callback`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ token: credential })
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Google login failed');
+      // NOTE: The @react-oauth/google library sends credential (ID token)
+      // But the actual OAuth flow should redirect to backend OAuth endpoint
+      // which we do via the GoogleLogin button's onSuccess handler
+      
+      if (credentialResponse?.credential) {
+        // This is the ID token from Google
+        const idToken = credentialResponse.credential;
+        console.log('🔐 ID Token:', idToken.substring(0, 30) + '...');
       }
 
-      const data = await response.json();
+      // The flow should be:
+      // 1. User clicks GoogleLogin button
+      // 2. GoogleLogin redirects to /api/auth/google
+      // 3. Backend redirects to Google OAuth
+      // 4. User authenticates with Google
+      // 5. Google redirects back to /api/auth/google/callback
+      // 6. Backend creates JWT and redirects to auth-success page
+      // 7. AuthSuccess component handles JWT extraction and stores it
 
-      if (data.success) {
-        // Save token and user
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-
-        // Update auth context
-        authLogin({ success: true, token: data.token, user: data.user });
-
-        console.log('✅ Google login successful');
-
-        // Redirect to dashboard
-        navigate('/');
-      } else {
-        throw new Error(data.error || 'Google login failed');
-      }
     } catch (error) {
       console.error('❌ Google login error:', error);
-      alert('Đăng nhập Google thất bại: ' + error.message);
+      throw error;
     }
-  }, [navigate, authLogin]);
+  }, []);
 
   const handleGoogleError = useCallback(() => {
     console.error('❌ Google login failed');
@@ -57,7 +47,7 @@ export const useGoogleLogin = () => {
   }, []);
 
   return {
-    handleGoogleLogin,
+    handleGoogleLoginSuccess,
     handleGoogleError
   };
 };
